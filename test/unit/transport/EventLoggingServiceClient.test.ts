@@ -1,0 +1,83 @@
+/*****
+ License
+ --------------
+ Copyright © 2017 Bill & Melinda Gates Foundation
+ The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ Contributors
+ --------------
+ This is the official list of the Mojaloop project contributors for this file.
+ Names of the original copyright holders (individuals or organizations)
+ should be listed with a '*' in the first column. People who have
+ contributed from an organization can be listed under the organization
+ that actually holds the copyright for their contributions (see the
+ Gates Foundation organization for an example). Those individuals should have
+ their names indented and be marked with a '-'. Email address can be added
+ optionally within square brackets <email>.
+ * Gates Foundation
+ - Name Surname <name.surname@gatesfoundation.com>
+
+ * Crosslake
+ - Lewis Daly <lewisd@crosslaketech.com>
+
+ --------------
+ ******/
+
+import Uuid from 'uuid/v4'
+import Sinon from 'sinon'
+
+import { EventLoggingServiceClient } from '../../../src/transport/EventLoggingServiceClient'
+import { EventMessage } from '../../../src/model/EventMessage'
+
+
+let client: EventLoggingServiceClient
+let sandbox: Sinon.SinonSandbox
+
+describe('EventLoggingServiceClient', () => {
+  beforeAll(() => {
+    client = new EventLoggingServiceClient('localhost', 55555)
+    sandbox = Sinon.createSandbox()
+  })
+
+  afterEach(() => {
+    sandbox.reset()
+  })
+
+  it('throws when content is null or undefined', async () => {
+    // Arrange
+    const invalidEvent: EventMessage = <EventMessage>{
+      type: 'application/json',
+      id: Uuid()
+    }
+    
+    // Act
+    const action = async () => await client.log(invalidEvent)
+    
+    // Assert
+    await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
+
+  })
+
+  //Hmm this is a little tricky to stub out, since we don't want to replace the entire function
+  //TODO: figure out the stubs here
+  it.skip('handles when grpcClient errors', async () => {
+    // Arrange
+    const event: EventMessage = {
+      type: 'application/json',
+      id: Uuid(),
+      content: {key: 'value'}
+    }
+    sandbox.stub(client, 'grpcClient').returns({
+      log: sandbox.stub()
+    })
+
+    // Act
+    const action = async () => await client.log(event)
+
+    // Assert
+    await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
+  })
+
+  it.todo('handles all other errors')
+})

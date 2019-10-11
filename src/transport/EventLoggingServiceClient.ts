@@ -23,7 +23,7 @@
  --------------
  ******/
 import { EventMessage, LogResponse } from "../model/EventMessage";
-import { toAny } from "./JsonToStructMapper";
+import { toAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
@@ -44,25 +44,26 @@ class EventLoggingServiceClient {
   /**
    * Log an event
    */
-  log = async ( event: EventMessage): Promise<LogResponse> => {
+  log = async (event: EventMessage): Promise<LogResponse> => {
     return new Promise((resolve, reject) => {
-      let wireEvent : any = Object.assign({}, event);
+      let wireEvent: any = Object.assign({}, event);
       if ( !event.content ) {
         throw new Error('Invalid eventMessage: content is mandatory');
       }
       try {
-      // wireEvent.content = convertJsontoStruct(event.content);
-      wireEvent.content = toAny(event.content, event.type);
-      Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEvent, null, 2)}`);
-      this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
-        Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
-        if ( error ) { reject(error); }
-        resolve(response);
-      })
-    } catch (e) {
-      Logger.error(e)
-      reject(e)
-    }
+        wireEvent.content = toAny(event.content, event.type);
+        Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEvent, null, 2)}`);
+        this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
+          Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+          if (error) { 
+            reject(error)
+          }
+          resolve(response)
+        })
+      } catch (e) {
+        Logger.error(e)
+        reject(e)
+      }
     })
   }
 }
