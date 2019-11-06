@@ -16,7 +16,7 @@ defaults_Dependencies: &defaults_Dependencies |
     apk --no-cache add bash
     apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
     npm config set unsafe-perm true
-    npm install -g node-gyp typescript
+    npm install -g node-gyp
 
 defaults_Typescript: &defaults_Typescript |
     npm run build
@@ -85,11 +85,11 @@ jobs:
           name: Install general dependencies
           command: *defaults_Dependencies
       - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Build typescript
           command: *defaults_Typescript
-      - restore_cache:
-          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Create dir for test results
           command: mkdir -p ./test/results
@@ -145,6 +145,11 @@ jobs:
           name: Install general dependencies
           command: *defaults_Dependencies
       - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Build typescript
+          command: *defaults_Typescript  
       - run:
           name: setup environment vars for SNAPSHOT release
           command: |
@@ -164,6 +169,8 @@ jobs:
           name: Install general dependencies
           command: *defaults_Dependencies
       - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Build typescript
           command: *defaults_Typescript
