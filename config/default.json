@@ -1,7 +1,7 @@
 {
   "ASYNC": true,
   "SERVER_HOST": "localhost",
-  "SERVER_PORT": 50051,
+  "SERVER_PORT": 50055,
   "SIDECAR_DISABLED": true,
   "SIDECAR_WITH_LOGGER": false
 }
