@@ -193,11 +193,7 @@ describe('Tracer', () => {
     action = async () => await tracer.audit(<EventMessage>newMessageA)
     await expect(action()).rejects.toThrowError('span finished. no further actions allowed')
     
-    action = async () => await tracer.getChild('b').finish()
-    await expect(action()).rejects.toThrowError('Finished trace cannot have a child span')
-    
-    let logresult = await child.audit(<EventMessage>newMessageA)
+    const logresult = await child.audit(<EventMessage>newMessageA)
     expect(logresult).not.toBeUndefined()
   })
-
 })

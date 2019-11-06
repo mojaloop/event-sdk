@@ -27,7 +27,7 @@ npm install @mojaloop/event-sdk
 Import library:
 
 ```javascript
-import { DefaultEventLogger } from "../DefaultEventLogger"`
+import { DefaultEventLogger } from "@mojaloop/event-sdk"`
 ```
 
 Create a Logger:
