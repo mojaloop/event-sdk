@@ -1,5 +1,3 @@
-
-
 const RC = require('parse-strings-in-object')(require('rc')('EVENT_SDK', require('../../config/default.json')))
 
 
@@ -10,8 +8,6 @@ type ConfigType = {
   EVENT_LOGGER_SIDECAR_DISABLED: boolean,
   EVENT_LOGGER_SIDECAR_WITH_LOGGER: boolean,
 }
-
-// console.log("ASYNC IS", RC.ASYNC)
 
 const Config: ConfigType = {
   ASYNC: RC.ASYNC,

@@ -27,9 +27,7 @@
  --------------
  ******/
 
- import { DefaultLoggerRecorder, DefaultSidecarRecorderAsync } from "../../src/Recorder"
-import { EventLoggingServiceClient } from "../../src/transport/EventLoggingServiceClient"
-import Config from "../../src/lib/config"
+import { DefaultLoggerRecorder, DefaultSidecarRecorderAsync } from "../../src/Recorder"
 
 
 describe('Recorder', () => {
@@ -53,30 +51,4 @@ describe('Recorder', () => {
     // Assert
     expect(result).toStrictEqual({status: 'accepted'})
   })
-
-  //TODO: convert to a proper unit test with mocking!pack
-  it.skip('records a message with the DefaultSidecarRecorderAsync', async () => {
-    // Arrange
-    const message = {
-      id: "xyz1234",
-      to: "DFSP1",
-      from: "DFSP1",
-      type: 'application/json',
-      content: {
-        headers: {},
-        payload: "http://example.com/v1/go"
-      }
-    }
-    //TODO: I don't know how this test is a unit test...
-
-    const client = new EventLoggingServiceClient(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
-    const recorder = new DefaultSidecarRecorderAsync(client)
-    
-    // Act
-    const result = await recorder.record(message)
-    
-    // Assert
-    expect(result).toStrictEqual({status: 'accepted'})
-  })
-
 })

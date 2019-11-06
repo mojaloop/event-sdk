@@ -56,28 +56,5 @@ describe('EventLoggingServiceClient', () => {
     
     // Assert
     await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
-
   })
-
-  //Hmm this is a little tricky to stub out, since we don't want to replace the entire function
-  //TODO: figure out the stubs here
-  it.skip('handles when grpcClient errors', async () => {
-    // Arrange
-    const event: EventMessage = {
-      type: 'application/json',
-      id: Uuid(),
-      content: {key: 'value'}
-    }
-    sandbox.stub(client, 'grpcClient').returns({
-      log: sandbox.stub()
-    })
-
-    // Act
-    const action = async () => await client.log(event)
-
-    // Assert
-    await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
-  })
-
-  it.todo('handles all other errors')
 })

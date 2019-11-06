@@ -31,9 +31,6 @@ import {
 
 
 describe('JsonToStructMapper', () => {
-  //TODO: not sure if I should implement, since this method isn't even used at all - the only use is commented out
-  it.todo('maps to a struct')
-
   describe('fromAny', () => {
     it('handles `text/plain` format', () => {
       // Arrange
@@ -83,7 +80,6 @@ describe('JsonToStructMapper', () => {
   })
 
   describe('toAny', () => {
-
     it('handles `text/plain` format', () => {
       // Arrange
       const expected = {
@@ -97,7 +93,6 @@ describe('JsonToStructMapper', () => {
       // Assert
       expect(result).toStrictEqual(expected)
     })
-
 
     it('handles `application/json` format', () => {
       // Arrange
