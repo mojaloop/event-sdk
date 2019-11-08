@@ -40,7 +40,7 @@ Edit the file in `./config/default.json` to configure the logger, or set the fol
 Import library:
 
 ```javascript
-import { DefaultEventLogger } from "../DefaultEventLogger"`
+import { DefaultEventLogger } from "@mojaloop/event-sdk"`
 ```
 
 Create a Logger:

@@ -284,7 +284,6 @@ class Span implements Partial<ISpan> {
    */
   async info(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
     let { action, type } = new LogEventTypeAction(LogEventAction.info)
-
     await this.recordMessage(message, type, action, state)
   }
 

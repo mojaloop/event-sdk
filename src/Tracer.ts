@@ -29,7 +29,6 @@ class Tracer implements ATracer {
    * @param defaultTagsSetter optional default tags setter method.
    */
   static createSpan(service: string, tags?: TraceTags, recorders?: Recorders, defaultTagsSetter?: Span['defaultTagsSetter']): Span {
-    //TODO: Add an async setting here?
     return new Span(new EventTraceMetadata({ service, tags }), recorders, defaultTagsSetter)
   }
 
