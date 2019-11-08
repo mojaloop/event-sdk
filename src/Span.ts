@@ -369,7 +369,7 @@ class Span implements Partial<ISpan> {
       recorder = this.recorders[key]!
     }
 
-    if (Config.ASYNC) {
+    if (Config.ASYNC_OVERRIDE) {
       //Don't wait for .record() to resolve, return straight away
       recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
       return true

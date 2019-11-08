@@ -65,10 +65,10 @@ describe('Span', () => {
     const testTimeoutNonAsync = 3 * 1000 //3 seconds
     const recordDelay = 2 * 1000 //2 seconds
 
-    it('returns immediately when ASYNC is on', async () => {
+    it('returns immediately when ASYNC_OVERRIDE is on', async () => {
       // Arrange
       sandbox.mock(Config)
-      Config.ASYNC = true
+      Config.ASYNC_OVERRIDE = true
       const parentSpan = Tracer.createSpan('parent_service', {tagA: 'valueA'}, testRecorder(recordDelay))
       
       // Act
@@ -78,10 +78,10 @@ describe('Span', () => {
       expect(true).toBe(true)
     }, testTimeoutAsync)
 
-    it('waits until logging is complete when ASYNC is off', async () => {
+    it('waits until logging is complete when ASYNC_OVERRIDE is off', async () => {
       // Arrange
       sandbox.mock(Config)
-      Config.ASYNC = false
+      Config.ASYNC_OVERRIDE = false
       const parentSpan = Tracer.createSpan('parent_service', { tagA: 'valueA' }, testRecorder(recordDelay))
 
       // Act
