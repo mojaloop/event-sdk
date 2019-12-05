@@ -361,8 +361,6 @@ class Span implements Partial<ISpan> {
    * @param action optional parameter for action. The default is based on type defaults
    * @param state optional parameter for state. Defaults to 'success'
    */
-
-  //  TODO: figure out if this gets called by the EventLoggingServiceServer
   private async recordMessage(message: TypeOfMessage, type: TypeEventTypeAction['type'], action?: TypeEventTypeAction['action'], state?: EventStateMetadata) {
     if (this.isFinished) {
       throw new Error('span finished. no further actions allowed')
@@ -375,9 +373,6 @@ class Span implements Partial<ISpan> {
     if (this.recorders[key]) {
       recorder = this.recorders[key]!
     }
-
-    // TODO: do we skip async based on TYPE? or ACTION?
-    console.log('type is:', type, 'action is:', action)
 
     if (Util.shouldOverrideEvent(asyncOverrides, type)) {
       //Don't wait for .record() to resolve, return straight away

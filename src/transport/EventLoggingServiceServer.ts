@@ -34,7 +34,6 @@ const Logger = require('@mojaloop/central-services-logger')
 const EVENT_RECEIVED = 'eventReceived';
 
 
-// TODO: The event sidecar is an instance of this server...
 class EventLoggingServiceServer extends events.EventEmitter {
 
   private server: any;

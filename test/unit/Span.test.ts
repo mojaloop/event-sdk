@@ -26,7 +26,6 @@
 
 import Sinon, { SinonSandbox } from 'sinon'
 
-// import { Tracer } from '../../src/Tracer'
 import Config from '../../src/lib/config'
 import { Recorders } from '../../src/Span'
 import { EventMessage, LogResponseStatus } from '../../src/model/EventMessage'
@@ -73,7 +72,6 @@ describe('Span', () => {
       const parentSpan = TracerProxy.createSpan('parent_service', {tagA: 'valueA'}, testRecorder(recordDelay))
       
       // Act
-      //TODO: I still don't know if this is right...
       await parentSpan.info('async message')
 
       // Assert

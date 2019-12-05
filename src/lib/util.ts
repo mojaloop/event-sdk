@@ -58,11 +58,6 @@ function eventAsyncOverrides(asyncOverridesString: string = ''): { [index: strin
  * @returns boolean
  */
 function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventType: TypeEventTypeAction['type']): boolean {
-  // //TODO: figure out how this can be undefined... wtf?
-  // if (!eventType) {
-  //   return false;
-  // }
-
   if (overrideDict[eventType]) {
     return true
   }
