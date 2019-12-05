@@ -65,14 +65,15 @@ describe('Span', () => {
     const testTimeoutNonAsync = 3 * 1000 //3 seconds
     const recordDelay = 2 * 1000 //2 seconds
 
-    it('returns `info` when ASYNC_OVERRIDE_EVENTS is `info`', async () => {
+    it('returns `info` when ASYNC_OVERRIDE_EVENTS is `log`', async () => {
       // Arrange
       sandbox.mock(Config)
-      Config.ASYNC_OVERRIDE_EVENTS = 'info'
+      Config.ASYNC_OVERRIDE_EVENTS = 'log'
       const TracerProxy = jest.requireActual('../../src/Tracer').Tracer
       const parentSpan = TracerProxy.createSpan('parent_service', {tagA: 'valueA'}, testRecorder(recordDelay))
       
       // Act
+      //TODO: I still don't know if this is right...
       await parentSpan.info('async message')
 
       // Assert

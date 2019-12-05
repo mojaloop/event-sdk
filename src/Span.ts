@@ -376,9 +376,10 @@ class Span implements Partial<ISpan> {
       recorder = this.recorders[key]!
     }
 
+    // TODO: do we skip async based on TYPE? or ACTION?
     console.log('type is:', type, 'action is:', action)
 
-    if (Util.shouldOverrideEvent(asyncOverrides, action)) {
+    if (Util.shouldOverrideEvent(asyncOverrides, type)) {
       //Don't wait for .record() to resolve, return straight away
       recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
       return true

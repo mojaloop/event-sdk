@@ -39,7 +39,6 @@ import { EventType, TypeEventTypeAction } from "model/EventMessage"
  * @returns overrideDict
  */
 function eventAsyncOverrides(asyncOverridesString: string = ''): { [index: string]: boolean} {
-  console.log('eventAsyncOverrides from', asyncOverridesString)
   const overrideDict: { [index: string]: boolean } = {}
   asyncOverridesString.split(',').map(val => overrideDict[val] = true)
 
@@ -58,12 +57,11 @@ function eventAsyncOverrides(asyncOverridesString: string = ''): { [index: strin
  * 
  * @returns boolean
  */
-function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventType?: TypeEventTypeAction['action']) {
-  console.log("shouldOverrideEvent", overrideDict, eventType)
-  //TODO: figure out how this can be undefined... wtf?
-  if (!eventType) {
-    return false;
-  }
+function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventType: TypeEventTypeAction['type']): boolean {
+  // //TODO: figure out how this can be undefined... wtf?
+  // if (!eventType) {
+  //   return false;
+  // }
 
   if (overrideDict[eventType]) {
     return true
