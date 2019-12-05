@@ -26,7 +26,7 @@
 
 'use strict'
 
-import { EventType } from "model/EventMessage"
+import { EventType, TypeEventTypeAction } from "model/EventMessage"
 
 /**
  * @function eventAsyncOverrides
@@ -34,11 +34,12 @@ import { EventType } from "model/EventMessage"
  *   and a boolean 'true'. 
  * 
  *   We use this dict in a lookup to determine which EventTypes to override the async for
- * @param asyncOverridesString { string } - A comma separated list of strings
+ * @param asyncOverridesString { string } - A comma separated list of strings. Defaults to an empty string.
  * 
  * @returns overrideDict
  */
-function eventAsyncOverrides(asyncOverridesString: string): { [index: string]: boolean} {
+function eventAsyncOverrides(asyncOverridesString: string = ''): { [index: string]: boolean} {
+  console.log('eventAsyncOverrides from', asyncOverridesString)
   const overrideDict: { [index: string]: boolean } = {}
   asyncOverridesString.split(',').map(val => overrideDict[val] = true)
 
@@ -57,7 +58,13 @@ function eventAsyncOverrides(asyncOverridesString: string): { [index: string]: b
  * 
  * @returns boolean
  */
-function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventType: EventType) {
+function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventType?: TypeEventTypeAction['action']) {
+  console.log("shouldOverrideEvent", overrideDict, eventType)
+  //TODO: figure out how this can be undefined... wtf?
+  if (!eventType) {
+    return false;
+  }
+
   if (overrideDict[eventType]) {
     return true
   }
