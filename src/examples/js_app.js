@@ -34,7 +34,7 @@ const EventSDK = require('../../dist/index')
 
 const Logger = require('@mojaloop/central-services-logger')
 
-function sleep(ms) {
+function sleep (ms) {
   return new Promise(resolve => {
     setTimeout(resolve, ms)
   })
@@ -105,7 +105,7 @@ const main = async () => {
   await parentSpan.finish(event)
 
   // // Injects trace context to a message carrier. When the trace is carried across few services, the trace context can be injects in the carrier that transports the data.
-  const messageWithContext = await IIChildSpan.injectContextToMessage(event)
+  // const messageWithContext = await IIChildSpan.injectContextToMessage(event)
   await sleep(2000)
   const requestHeadersWithContext = await IIChildSpan.injectContextToHttpRequest(request)
 
