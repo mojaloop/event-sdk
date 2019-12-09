@@ -6,7 +6,8 @@
   "types": "./dist/index.d.ts",
   "files": [
     "/config",
-    "/dist"
+    "/dist",
+    "/protos"
   ],
   "scripts": {
     "ts_app": "tsc ; ts-node src/examples/ts_app.ts",
