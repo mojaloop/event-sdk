@@ -150,7 +150,6 @@ class Span implements Partial<ISpan> {
 
    defaultTagsSetter(message?: TypeOfMessage): Span {
     const w3cHeaders = getTracestateTag(this.spanContext)
-     console.log(`defaultTagsSetter::w3cHeaders=${JSON.stringify(w3cHeaders)}`)
     !!w3cHeaders && this.setTags({ ...this.spanContext.tags, ...w3cHeaders })
     return this
   }

@@ -45,7 +45,6 @@ class Tracer implements ATracer {
       }
     }
     const tracestate = (Config.EVENT_LOGGER_VENDOR_PREFIX in resultMap) ? resultMap[Config.EVENT_LOGGER_VENDOR_PREFIX] : {}
-    console.log(`getOwnVendorTracestate:tracestate(request=${JSON.stringify(tracestateHeader)})=${JSON.stringify(tracestate)}`)
     return tracestateDecoder(tracestate.vendor, tracestate.parentId)
   }
 
@@ -84,16 +83,6 @@ class Tracer implements ATracer {
         }
       } : { ...resultContext, ...{ parentSpanId: undefined } }
     }
-    // console.log(`extractContextFromHttpRequest::parentId= ${parentId}`)
-    // console.log(`extractContextFromHttpRequest::(!!tracestateDecoded && !!tracestateDecoded.parentId)= ${(!!tracestateDecoded && !!tracestateDecoded.parentId)}`)
-    // console.log(`extractContextFromHttpRequest::context.id= ${context.id}`)
-    // console.log(`extractContextFromHttpRequest::(!!context && !!context.id)= ${(!!context && !!context.id)}`)
-    // console.log(`parentIdparentIdparentIdparentIdparentIdparentId[traceId=${context.traceId}, id=${context.id}, tracestate=${request.headers.tracestate}, tracestateDecoded.parentId=${tracestateDecoded!.parentId}, tracestateDecoded.vendor=${tracestateDecoded!.vendor}]=${parentId}`)
-    // console.log(`extractContextFromHttpRequest::tracestateDecoded= ${tracestateDecoded}`)
-    // console.log(`extractContextFromHttpRequest::tracestateDecoded.vendor= ${tracestateDecoded!.vendor}`)
-    // console.log(`extractContextFromHttpRequest::Config.EVENT_LOGGER_VENDOR_PREFIX= ${Config.EVENT_LOGGER_VENDOR_PREFIX}`)
-    // console.log(`extractContextFromHttpRequest::tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX=${tracestateDecoded!.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX}`)
-    // console.log(`extractContextFromHttpRequest::(!!tracestateDecoded && tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX)=${(!!tracestateDecoded && tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX)}`)
 
     let outputContext = <TypeSpanContext>Object.assign({}, resultContext, {
       service,
