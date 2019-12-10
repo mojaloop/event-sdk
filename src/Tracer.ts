@@ -66,7 +66,13 @@ class Tracer implements ATracer {
    * @param recorders optional recorders. Defaults to defaultRecorder, which is either logger or sidecar client, based on default.json DISABLE_SIDECAR value
    */
   static createChildSpanFromContext(service: string, spanContext: TypeSpanContext, recorders?: Recorders): Span {
-    let resultContext = <TypeSpanContext>{ ...spanContext, ...{ parentSpanId: spanContext.spanId } }
+    let resultContext
+    if (!!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
+      resultContext = <TypeSpanContext>{ ...spanContext, ...{ parentSpanId: undefined } }
+    } else {
+      resultContext = <TypeSpanContext>{ ...spanContext, ...{ parentSpanId: spanContext.spanId } }
+    }
+      
     if (!!spanContext.tags && !!spanContext.tags.tracestate) {
       const tracestateDecoded = spanContext.tags.tracestate ? this.getOwnVendorTracestate(spanContext.tags.tracestate) : undefined
       const parentId = (!!tracestateDecoded && !!tracestateDecoded.parentId) ? tracestateDecoded.parentId : undefined 
@@ -83,7 +89,7 @@ class Tracer implements ATracer {
         }
       } : { ...resultContext, ...{ parentSpanId: undefined } }
     }
-
+    
     let outputContext = <TypeSpanContext>Object.assign({}, resultContext, {
       service,
       spanId: undefined,
