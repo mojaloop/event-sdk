@@ -148,14 +148,9 @@ class Span implements Partial<ISpan> {
    * @param message the message which tags will be extracted from
    */
 
-  defaultTagsSetter(message?: TypeOfMessage): Span {
-    if (!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
-      return this
-    }
-    const w3cHeaders = {
-      tracestate: createW3CTracestate(this.spanContext, this.spanContext.tags!.tracestate)
-    }
-    this.setTags({ ...this.spanContext.tags, ...w3cHeaders })
+   defaultTagsSetter(message?: TypeOfMessage): Span {
+    const w3cHeaders = getTracestateTag(this.spanContext)
+    !!w3cHeaders && this.setTags({ ...this.spanContext.tags, ...w3cHeaders })
     return this
   }
 
@@ -563,6 +558,11 @@ const createW3Ctreaceparent = (spanContext: TypeSpanContext): string => {
   return W3CHeaders.toString()
 }
 
+const getTracestateTag = (spanContext: TypeSpanContext): { [ key: string ]: string } | false => {
+  return !!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED && {
+    tracestate: createW3CTracestate(spanContext, spanContext.tags!.tracestate)
+  }
+}
 
 
 export {
@@ -570,5 +570,6 @@ export {
   ContextOptions,
   Recorders,
   setHttpHeader,
-  createW3CTracestate
+  createW3CTracestate,
+  getTracestateTag
 }

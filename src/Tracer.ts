@@ -1,6 +1,6 @@
 import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpRequestOptions } from "./model/EventMessage";
 
-import { Span, ContextOptions, Recorders, setHttpHeader } from "./Span"
+import { Span, ContextOptions, Recorders, setHttpHeader, getTracestateTag } from "./Span"
 import Config from "./lib/config";
 
 const _ = require('lodash');
@@ -67,7 +67,7 @@ class Tracer implements ATracer {
    * @param recorders optional recorders. Defaults to defaultRecorder, which is either logger or sidecar client, based on default.json DISABLE_SIDECAR value
    */
   static createChildSpanFromContext(service: string, spanContext: TypeSpanContext, recorders?: Recorders): Span {
-    let resultContext = {...spanContext}
+    let resultContext = <TypeSpanContext>{ ...spanContext, ...{ parentSpanId: spanContext.spanId } }
     if (!!spanContext.tags && !!spanContext.tags.tracestate) {
       const tracestateDecoded = spanContext.tags.tracestate ? this.getOwnVendorTracestate(spanContext.tags.tracestate) : undefined
       const parentId = (!!tracestateDecoded && !!tracestateDecoded.parentId) ? tracestateDecoded.parentId : undefined 
@@ -82,7 +82,7 @@ class Tracer implements ATracer {
         tags: {
           tracestate: spanContext.tags.tracestate
         }
-      } : { ...resultContext, ...{ parentSpanId: undefined } }
+      } : { ...resultContext, ...{ parentSpanId: spanContext.spanId } }
     }
     // console.log(`extractContextFromHttpRequest::parentId= ${parentId}`)
     // console.log(`extractContextFromHttpRequest::(!!tracestateDecoded && !!tracestateDecoded.parentId)= ${(!!tracestateDecoded && !!tracestateDecoded.parentId)}`)
@@ -94,7 +94,6 @@ class Tracer implements ATracer {
     // console.log(`extractContextFromHttpRequest::Config.EVENT_LOGGER_VENDOR_PREFIX= ${Config.EVENT_LOGGER_VENDOR_PREFIX}`)
     // console.log(`extractContextFromHttpRequest::tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX=${tracestateDecoded!.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX}`)
     // console.log(`extractContextFromHttpRequest::(!!tracestateDecoded && tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX)=${(!!tracestateDecoded && tracestateDecoded.vendor === Config.EVENT_LOGGER_VENDOR_PREFIX)}`)
-
 
     let outputContext = <TypeSpanContext>Object.assign({}, resultContext, {
       service,
@@ -184,13 +183,11 @@ class Tracer implements ATracer {
           traceId: context.traceId,
           spanId: context.id,
           flags: context.flags,
-          sampled,
-          tags: {
-            tracestate: request.headers.tracestate
-          }
+          sampled 
+       })
+        if (request.headers.tracestate || Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
+          spanContext = {...spanContext, ...{ tags: { tracestate: request.headers.tracestate } }}
         }
-  
-  )
         return <TypeSpanContext>spanContext
       }
     }
