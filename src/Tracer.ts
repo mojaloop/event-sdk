@@ -82,7 +82,7 @@ class Tracer implements ATracer {
         tags: {
           tracestate: spanContext.tags.tracestate
         }
-      } : { ...resultContext, ...{ parentSpanId: spanContext.spanId } }
+      } : { ...resultContext, ...{ parentSpanId: undefined } }
     }
     // console.log(`extractContextFromHttpRequest::parentId= ${parentId}`)
     // console.log(`extractContextFromHttpRequest::(!!tracestateDecoded && !!tracestateDecoded.parentId)= ${(!!tracestateDecoded && !!tracestateDecoded.parentId)}`)
