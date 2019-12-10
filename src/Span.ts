@@ -144,12 +144,13 @@ class Span implements Partial<ISpan> {
   }
 
   /**
-   * A method to set tags by default. Not implemented yet
+   * A method to set tags by default.
    * @param message the message which tags will be extracted from
    */
 
    defaultTagsSetter(message?: TypeOfMessage): Span {
     const w3cHeaders = getTracestateTag(this.spanContext)
+     console.log(`defaultTagsSetter::w3cHeaders=${JSON.stringify(w3cHeaders)}`)
     !!w3cHeaders && this.setTags({ ...this.spanContext.tags, ...w3cHeaders })
     return this
   }
@@ -559,9 +560,14 @@ const createW3Ctreaceparent = (spanContext: TypeSpanContext): string => {
 }
 
 const getTracestateTag = (spanContext: TypeSpanContext): { [ key: string ]: string } | false => {
-  return !!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED && {
-    tracestate: createW3CTracestate(spanContext, spanContext.tags!.tracestate)
+  let tracestate
+  if (!!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED || (!!spanContext.tags && !!spanContext.tags!.tracestate)) {
+    let currentTracestate = undefined
+    if (!!spanContext.tags && !!spanContext.tags.tracestate) currentTracestate = spanContext.tags.tracestate
+    tracestate = createW3CTracestate(spanContext, currentTracestate)
+    if(tracestate) return { tracestate }
   }
+  return false
 }
 
 

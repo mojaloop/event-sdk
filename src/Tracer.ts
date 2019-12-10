@@ -80,7 +80,7 @@ class Tracer implements ATracer {
         sampled: spanContext.sampled,
         parentSpanId: parentId,
         tags: {
-          tracestate: spanContext.tags.tracestate
+          ...spanContext.tags
         }
       } : { ...resultContext, ...{ parentSpanId: undefined } }
     }
