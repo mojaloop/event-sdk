@@ -18,21 +18,58 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Ramiro González Maciel <ramiro@modusbox.com>
-
+ - Shashikant Hirugade <shashikant.hirugade@modusbox.com>
  --------------
  ******/
+
 'use strict'
 
-import { EventMessage } from "../model/EventMessage";
-import { EventLoggingServiceServer, EVENT_RECEIVED } from "../transport/EventLoggingServiceServer";
-import Config from '../lib/config'
-const Logger = require('@mojaloop/central-services-logger')
-const Setup = require('../../src/shared/setup')
+const Test = require('tapes')(require('tape'))
+const Sinon = require('sinon')
+const Handler = require('../../../../src/api/metrics/handler')
+const Metrics = require('@mojaloop/central-services-metrics')
 
-let server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
-server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
-  Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
-  Setup.initializeInstrumentation()
-});
-server.start();
+function createRequest (routes) {
+  const value = routes || []
+  return {
+    server: {
+      table: () => {
+        return [{ table: value }]
+      }
+    }
+  }
+}
+
+Test('metrics handler', (handlerTest) => {
+  let sandbox
+  handlerTest.beforeEach(t => {
+    sandbox = Sinon.createSandbox()
+    sandbox.stub(Metrics)
+    t.end()
+  })
+
+  handlerTest.afterEach(t => {
+    sandbox.restore()
+    t.end()
+  })
+
+  handlerTest.test('metrics should', (healthTest) => {
+    healthTest.test('return thr metrics ok', async function (assert) {
+      const reply = {
+        response: () => {
+          return {
+            code: (statusCode) => {
+              assert.equal(statusCode, 200)
+              assert.end()
+            }
+          }
+        }
+      }
+
+      Handler.metrics(createRequest(), reply)
+    })
+    healthTest.end()
+  })
+
+  handlerTest.end()
+})

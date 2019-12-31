@@ -18,21 +18,26 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Ramiro González Maciel <ramiro@modusbox.com>
-
+ - Pedro Barreto <pedrob@crosslaketech.com>
+ - Rajiv Mothilal <rajivmothilal@gmail.com>
+ - Shashikant Hirugade <shashikant.hirugade@modusbox.com>
  --------------
  ******/
+
 'use strict'
 
-import { EventMessage } from "../model/EventMessage";
-import { EventLoggingServiceServer, EVENT_RECEIVED } from "../transport/EventLoggingServiceServer";
-import Config from '../lib/config'
-const Logger = require('@mojaloop/central-services-logger')
-const Setup = require('../../src/shared/setup')
+const Handler = require('./handler')
+const tags = ['api', 'metrics']
 
-let server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
-server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
-  Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
-  Setup.initializeInstrumentation()
-});
-server.start();
+module.exports = [
+  {
+    method: 'GET',
+    path: '/metrics',
+    handler: Handler.metrics,
+    config: {
+      tags: tags,
+      description: 'Prometheus metrics endpoint',
+      id: 'metrics'
+    }
+  }
+]

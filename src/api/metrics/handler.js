@@ -18,21 +18,15 @@
  * Gates Foundation
  - Name Surname <name.surname@gatesfoundation.com>
 
- - Ramiro González Maciel <ramiro@modusbox.com>
-
+ - Pedro Barreto <pedrob@crosslaketech.com>
+ - Rajiv Mothilal <rajivmothilal@gmail.com>
  --------------
  ******/
+
 'use strict'
 
-import { EventMessage } from "../model/EventMessage";
-import { EventLoggingServiceServer, EVENT_RECEIVED } from "../transport/EventLoggingServiceServer";
-import Config from '../lib/config'
-const Logger = require('@mojaloop/central-services-logger')
-const Setup = require('../../src/shared/setup')
+const Metrics = require('@mojaloop/central-services-metrics')
 
-let server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
-server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
-  Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
-  Setup.initializeInstrumentation()
-});
-server.start();
+exports.metrics = function (request, h) {
+  return h.response(Metrics.getMetricsForPrometheus()).code(200)
+}
