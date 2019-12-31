@@ -28,6 +28,7 @@ import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
 const grpc = require('grpc')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 class EventLoggingServiceClient {
 
@@ -46,6 +47,11 @@ class EventLoggingServiceClient {
    */
   log = async (event: EventMessage): Promise<LogResponse> => {
     return new Promise((resolve, reject) => {
+      const histTimerEnd = Metrics.getHistogram(
+          'eventSdk_log',
+          'Log an event',
+          ['success']
+      ).startTimer()
       let wireEvent: any = Object.assign({}, event);
       if ( !event.content ) {
         throw new Error('Invalid eventMessage: content is mandatory');
@@ -67,8 +73,10 @@ class EventLoggingServiceClient {
       })
     } catch (e) {
       Logger.error(e)
+      histTimerEnd({ success: false })
       reject(e)
     }
+    histTimerEnd({ success: true })
     })
   }
 }

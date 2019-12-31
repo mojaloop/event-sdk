@@ -6,6 +6,7 @@ import Config from "./lib/config";
 const _ = require('lodash');
 
 const TraceParent = require('traceparent')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 /**
  * Describes Event SDK methods from Tracer perspective
@@ -57,7 +58,14 @@ class Tracer implements ATracer {
    */
 
   static createSpan(service: string, tags?: TraceTags, recorders?: Recorders, defaultTagsSetter?: Span['defaultTagsSetter']): Span {
-    return new Span(new EventTraceMetadata({ service, tags }), recorders, defaultTagsSetter)
+      const histTimerEnd = Metrics.getHistogram(
+          'eventSdk_createSpan',
+          'Creates new span from new trace',
+          ['success']
+      ).startTimer()
+      const span = new Span(new EventTraceMetadata({service, tags}), recorders, defaultTagsSetter)
+      histTimerEnd({success: true})
+      return span
   }
   /**
    * Creates new child span from context with new service name
@@ -66,6 +74,11 @@ class Tracer implements ATracer {
    * @param recorders optional recorders. Defaults to defaultRecorder, which is either logger or sidecar client, based on default.json DISABLE_SIDECAR value
    */
   static createChildSpanFromContext(service: string, spanContext: TypeSpanContext, recorders?: Recorders): Span {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_createChildSpanFromContext',
+        'Creates new child span from context with new service name',
+        ['success']
+    ).startTimer()
     let resultContext
     if (!!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
       resultContext = <TypeSpanContext>{ ...spanContext, ...{ parentSpanId: undefined } }
@@ -96,7 +109,9 @@ class Tracer implements ATracer {
       startTimestamp: undefined,
       finishTimestamp: undefined
     })
-    return new Span(new EventTraceMetadata(outputContext), recorders) as Span
+    const span = new Span(new EventTraceMetadata(outputContext), recorders) as Span
+    histTimerEnd({success: true})
+    return span
   }
 
   /**
