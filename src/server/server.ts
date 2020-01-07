@@ -28,11 +28,9 @@ import { EventMessage } from "../model/EventMessage";
 import { EventLoggingServiceServer, EVENT_RECEIVED } from "../transport/EventLoggingServiceServer";
 import Config from '../lib/config'
 const Logger = require('@mojaloop/central-services-logger')
-const Setup = require('../../src/shared/setup')
 
 let server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
 server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
   Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
-  Setup.initializeInstrumentation()
 });
 server.start();
