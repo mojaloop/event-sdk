@@ -32,6 +32,7 @@
 import Sinon from 'sinon'
 import Uuid from 'uuid/v4'
 
+import Config from '../../src/lib/config'
 import { Tracer } from "../../src/Tracer"
 import { EventLoggingServiceClient } from '../../src/transport/EventLoggingServiceClient'
 import { DefaultSidecarRecorder } from '../../src/Recorder'
@@ -73,6 +74,108 @@ describe('Tracer', () => {
 
   afterEach(() => {
     sandbox.restore()
+  })
+
+  //TODO: enable tests if we can't test all conditions easily
+  // describe('getOwnVendorTracestate', () => {
+  //   it('should get the vendor tracestate', () => {
+  //     // Arrange
+      
+  //     // Act
+  //     const result = Tracer.getOwnVendorTracestate('testHeader')
+      
+  //     // Assert
+
+  //   })
+  // })
+
+  describe('createChildSpanFromContext', () => {
+    it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
+      // Arrange
+      sandbox.mock(Config)
+      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
+      Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      let spanContext = tracer.getContext()
+      
+      // Act
+      let childB = Tracer.createChildSpanFromContext('service2', spanContext)
+      
+      // Assert
+      const tags = childB.getContext().tags!
+      expect(tags['tracestate']).not.toBeDefined()
+    })
+
+    it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
+      // Arrange
+      sandbox.mock(Config)
+      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      let spanContext = tracer.getContext()
+      
+      // Act
+      let childB = Tracer.createChildSpanFromContext('service2', spanContext)
+      
+      // Assert
+      const tags = childB.getContext().tags!
+      expect(tags['tracestate']).toBeDefined()
+    })
+  })
+
+  describe('extractContextFromMessage', () => {
+    /*
+      Note: this is a somewhat invalid test, since there shouldn't really be a case
+      where EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is `true`, and there is no `request.headers.tracestate`
+    */
+    it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is true and tracestate does not exist', () => {
+      // Arrange
+      sandbox.mock(Config)
+      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
+
+      // Act
+      delete request.headers.tracestate
+      const result = Tracer.extractContextFromHttpRequest(request)!
+      
+      // Assert
+      const tracestateTag = result.tags!.tracestate
+      expect(tracestateTag).not.toBeDefined()
+    })
+
+    it('returns undefined when there are no xb3 headers', () => {
+      // Arrange
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
+
+      // Act
+      const result = Tracer.extractContextFromHttpRequest(request, HttpRequestOptions.xb3)!
+      
+      // Assert
+      expect(result).not.toBeDefined()
+    })
+
+    it('returns undefined when parsing w3c headers with no traceparent', () => {
+      // Arrange
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
+
+      // Act
+      delete request.headers.traceparent
+      const result = Tracer.extractContextFromHttpRequest(request, HttpRequestOptions.w3c)!
+      
+      // Assert
+      expect(result).not.toBeDefined()
+    })
   })
 
   it('should create a parent span', async () => {

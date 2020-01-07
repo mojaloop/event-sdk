@@ -65,7 +65,21 @@ function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventTy
   return false
 }
 
+/**
+ * @function traceStateDecoder
+ * 
+ * @description A default implementation of a tracestateDecoder, which defaults vendor to 'unknownVendor'
+ */
+function tracestateDecoder(vendor: string | undefined, tracestate: string): { [key: string]: string } {
+  vendor = !!vendor ? vendor : 'unknownVendor'
+  return {
+    vendor,
+    parentId: tracestate
+  }
+}
+
 export default {
   eventAsyncOverrides,
-  shouldOverrideEvent
+  shouldOverrideEvent,
+  tracestateDecoder
 }

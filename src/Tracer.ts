@@ -1,7 +1,8 @@
 import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpRequestOptions } from "./model/EventMessage";
 
-import { Span, ContextOptions, Recorders, setHttpHeader, getTracestateTag } from "./Span"
-import Config from "./lib/config";
+import { Span, ContextOptions, Recorders, setHttpHeader } from "./Span"
+import Config from "./lib/config"
+import Util from './lib/util'
 
 const _ = require('lodash');
 
@@ -20,15 +21,6 @@ abstract class ATracer {
   static extractContextFromHttpRequest: (request: any, type?: HttpRequestOptions, tracestateDecoder?: (tracestate: string) => string | {[key: string]: string} ) => TypeSpanContext | undefined
 }
 
-const tracestateDecoder = (vendor: string | undefined, tracestate: string): { [key: string]: string } => {
-  vendor = !!vendor ? vendor : 'unknownVendor'
-  return {
-    vendor,
-    parentId: tracestate
-  }
-}
-
-
 class Tracer implements ATracer {
 
   private static getOwnVendorTracestate = (tracestateHeader: string): { [key: string] : string } | undefined => {
@@ -45,7 +37,7 @@ class Tracer implements ATracer {
       }
     }
     const tracestate = (Config.EVENT_LOGGER_VENDOR_PREFIX in resultMap) ? resultMap[Config.EVENT_LOGGER_VENDOR_PREFIX] : {}
-    return tracestateDecoder(tracestate.vendor, tracestate.parentId)
+    return Util.tracestateDecoder(tracestate.vendor, tracestate.parentId)
   }
 
     /**
@@ -179,7 +171,7 @@ class Tracer implements ATracer {
           spanId: context.id,
           flags: context.flags,
           sampled 
-       })
+        })
         if (request.headers.tracestate || Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
           spanContext = {...spanContext, ...{ tags: { tracestate: request.headers.tracestate } }}
         }
