@@ -128,6 +128,54 @@ describe('Tracer', () => {
   })
 
   describe('extractContextFromMessage', () => {
+    it('extacts the content with basic carrier', () => {
+      // Arrange
+      const carrier = {
+        trace: {
+          startTimestamp: '2020-01-07T06:25:24.189Z',
+          service: 'service1',
+          traceId: '01635e2be91b0fde212e4259f439d9d7',
+          spanId: '653ec4db6500f12e',
+          parentSpanId: undefined,
+          sampled: undefined,
+          flags: undefined,
+          tags: {tagA: 'valueA'},
+          finishTimestamp: undefined
+        }
+      }
+
+      // Act
+      const result = Tracer.extractContextFromMessage(carrier)
+      
+      // Assert
+      expect(result).toEqual(carrier.trace)
+    })
+
+    it('extacts empty content with an invalid carrier', () => {
+      // Arrange
+      const carrier = {
+        notTrace: {
+          startTimestamp: '2020-01-07T06:25:24.189Z',
+          service: 'service1',
+          traceId: '01635e2be91b0fde212e4259f439d9d7',
+          spanId: '653ec4db6500f12e',
+          parentSpanId: undefined,
+          sampled: undefined,
+          flags: undefined,
+          tags: {tagA: 'valueA'},
+          finishTimestamp: undefined
+        }
+      }
+
+      // Act
+      const result = Tracer.extractContextFromMessage(carrier)
+      
+      // Assert
+      expect(result).not.toEqual(carrier.notTrace)
+    })
+  })
+
+  describe('extractContextFromHttpRequest', () => {
     /*
       Note: this is a somewhat invalid test, since there shouldn't really be a case
       where EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is `true`, and there is no `request.headers.tracestate`
@@ -136,6 +184,24 @@ describe('Tracer', () => {
       // Arrange
       sandbox.mock(Config)
       Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
+
+      // Act
+      delete request.headers.tracestate
+      const result = Tracer.extractContextFromHttpRequest(request)!
+      
+      // Assert
+      const tracestateTag = result.tags!.tracestate
+      expect(tracestateTag).not.toBeDefined()
+    })
+
+    it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false and tracestate does not exist', () => {
+      // Arrange
+      sandbox.mock(Config)
+      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
       Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
