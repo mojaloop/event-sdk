@@ -1,7 +1,6 @@
 import serializeError from 'serialize-error';
 import _ from 'lodash'
 const TraceParent = require('traceparent')
-const Metrics = require('@mojaloop/central-services-metrics')
 
 import {
   NullEventAction,
@@ -168,14 +167,8 @@ class Span implements Partial<ISpan> {
      * @param recorders the recorders which are be set to the child span. If omitted, the recorders of the parent span are used
      */
   getChild(service: string, recorders: Recorders = this.recorders): Span {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_getChild',
-        'Creates and returns new child span of the current span and changes the span service name',
-        ['success']
-    ).startTimer()
     try {
       let inputTraceContext: TypeSpanContext = this.getContext()
-      histTimerEnd({ success: true })
       return new Span(new EventTraceMetadata(Object.assign({},
         inputTraceContext, {
         service,
@@ -185,7 +178,6 @@ class Span implements Partial<ISpan> {
         parentSpanId: inputTraceContext.spanId
       })), recorders, this.defaultTagsSetter)
     } catch (e) {
-      histTimerEnd({ success: false })
       throw (e)
     }
   }
@@ -227,17 +219,11 @@ class Span implements Partial<ISpan> {
    * @param tags key value pairs of tags. Tags can be changed on different child spans
    */
   setTags(tags: TraceTags): this {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_setTags',
-        'Sets tags to the current span. If child span is created, the tags are passed on.',
-        ['success']
-    ).startTimer()
     let newContext: TypeSpanContext = new EventTraceMetadata(this.getContext())
     for (let key in tags) {
       newContext.tags![key] = tags[key]
     }
     this.spanContext = Object.freeze(new EventTraceMetadata(newContext))
-    histTimerEnd({ success: true })
     return this
   }
 
@@ -247,11 +233,6 @@ class Span implements Partial<ISpan> {
   * @param finishTimestamp optional parameter for the finish time. If omitted, current time is used.
   */
   async finish(message?: TypeOfMessage, state?: EventStateMetadata, finishTimestamp?: string | Date): Promise<this> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_finish',
-        'Finishes the current span and its trace and sends the data to the tracing framework.',
-        ['success']
-    ).startTimer()
     if (this.spanContext.finishTimestamp) {
       return Promise.reject(new Error('span already finished'))
     }
@@ -286,11 +267,6 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   private async trace(message?: TypeOfMessage, spanContext: TypeSpanContext = this.spanContext, state?: EventStateMetadata, action?: TraceEventAction): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_trace',
-        'Sends trace message to the tracing framework.',
-        ['success']
-    ).startTimer()
     if (!message) {
       message = new EventMessage({
         type: 'application/json',
@@ -300,10 +276,8 @@ class Span implements Partial<ISpan> {
     try {
       await this.recordMessage(message, TraceEventTypeAction.getType(), action, state)
       this.isFinished = this.spanContext.finishTimestamp ? true : false
-      histTimerEnd({ success: true })
       return this
     } catch (e) {
-      histTimerEnd({ success: false })
       throw new Error(`Error when logging trace. ${JSON.stringify(e, null, 2)}`)
     }
   }
@@ -314,14 +288,8 @@ class Span implements Partial<ISpan> {
    * @param action optional parameter for action. Defaults to 'default'
    * @param state optional parameter for state. Defaults to 'success'
    */
-  async audit(message: TypeOfMessage, action: AuditEventAction = AuditEventAction.default, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_audit',
-        'Sends audit type message to the event logging framework.',
-        ['success']
-    ).startTimer()
+  async audit(message: TypeOfMessage, action?: AuditEventAction, state?: EventStateMetadata): Promise<any> {
     let result = await this.recordMessage(message, AuditEventTypeAction.getType(), action, state)
-    histTimerEnd({ success: true })
     return result
   }
 
@@ -333,14 +301,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async info(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_info',
-        'Logs INFO type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.info)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -351,14 +313,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async debug(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_debug',
-        'Logs DEBUG type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.debug)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -369,14 +325,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async verbose(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_verbose',
-        'Logs VERBOSE type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.verbose)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -387,14 +337,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async performance(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_performance',
-        'Logs PERFORMANCE type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.performance)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -405,14 +349,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async warning(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_warning',
-        'Logs WARNING type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.warning)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -423,14 +361,8 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   async error(message: TypeOfMessage, state?: EventStateMetadata): Promise<any> {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_error',
-        'Logs ERROR type message.',
-        ['success']
-    ).startTimer()
     let { action, type } = new LogEventTypeAction(LogEventAction.error)
     await this.recordMessage(message, type, action, state)
-    histTimerEnd({ success: true })
   }
 
   /**
@@ -441,13 +373,7 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   private async recordMessage(message: TypeOfMessage, type: TypeEventTypeAction['type'], action?: TypeEventTypeAction['action'], state?: EventStateMetadata) {
-    const histTimerEnd = Metrics.getHistogram(
-        'eventSdk_recordMessage',
-        'Sends Event message to recorders',
-        ['success']
-    ).startTimer()
     if (this.isFinished) {
-      histTimerEnd({ success: true })
       throw new Error('span finished. no further actions allowed')
     }
 
@@ -461,18 +387,16 @@ class Span implements Partial<ISpan> {
 
     if (Util.shouldOverrideEvent(asyncOverrides, type)) {
       //Don't wait for .record() to resolve, return straight away
-      recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
-      histTimerEnd({ success: true })
+      recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
       return true
     }
 
-    const logResult = await recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
+    const logResult = await recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
 
     if (logResult.status !== LogResponseStatus.accepted) {
-      histTimerEnd({ success: false })
       throw new Error(`Error when recording ${type}-${action} event. status: ${logResult.status}`)
     }
-    histTimerEnd({ success: true })
+
     return logResult;
   }
 

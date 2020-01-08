@@ -314,7 +314,7 @@ class Span implements Partial<ISpan> {
    * @param action optional parameter for action. Defaults to 'default'
    * @param state optional parameter for state. Defaults to 'success'
    */
-  async audit(message: TypeOfMessage, action: AuditEventAction = AuditEventAction.default, state?: EventStateMetadata): Promise<any> {
+  async audit(message: TypeOfMessage, action?: AuditEventAction, state?: EventStateMetadata): Promise<any> {
     const histTimerEnd = Metrics.getHistogram(
         'eventSdk_audit',
         'Sends audit type message to the event logging framework.',
@@ -461,12 +461,12 @@ class Span implements Partial<ISpan> {
 
     if (Util.shouldOverrideEvent(asyncOverrides, type)) {
       //Don't wait for .record() to resolve, return straight away
-      recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
+      recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
       histTimerEnd({ success: true })
       return true
     }
 
-    const logResult = await recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
+    const logResult = await recorder.record(newEnvelope, Config.EVENT_LOGGER_SIDECAR_WITH_LOGGER)
 
     if (logResult.status !== LogResponseStatus.accepted) {
       histTimerEnd({ success: false })

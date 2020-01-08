@@ -2,6 +2,7 @@ import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpReque
 
 import { Span, ContextOptions, Recorders, setHttpHeader, getTracestateTag } from "./Span"
 import Config from "./lib/config";
+import { setMaxListeners } from "cluster";
 
 const _ = require('lodash');
 
@@ -100,7 +101,18 @@ class Tracer implements ATracer {
         tags: {
           ...spanContext.tags
         }
-      } : { ...resultContext, ...{ parentSpanId: undefined } }
+      } : ((!!Config.EVENT_LOGGER_TRACEID_PER_VENDOR) ?
+      { ...resultContext,
+        ...{
+          parentSpanId: undefined,
+          traceId: undefined
+        }
+      } :
+        { ...resultContext,
+          ...{
+            parentSpanId: undefined
+          }
+        })
     }
     
     let outputContext = <TypeSpanContext>Object.assign({}, resultContext, {
@@ -113,6 +125,7 @@ class Tracer implements ATracer {
     histTimerEnd({success: true})
     return span
   }
+
 
   /**
    * Injects trace context into a carrier with optional path.
