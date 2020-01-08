@@ -53,7 +53,6 @@ class EventLoggingServiceClient {
         wireEvent.content = toAny(event.content, event.type);
 
         let wireEventCopy: any = JSON.parse(JSON.stringify(wireEvent));
-        console.log('type is', wireEventCopy.content.value.type)
         if (wireEventCopy.content.value.type === 'Buffer') {
           wireEventCopy.content.value = `Buffer(${wireEventCopy.content.value.data.length})`
         }
