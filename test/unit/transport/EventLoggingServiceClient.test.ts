@@ -77,7 +77,6 @@ describe('EventLoggingServiceClient', () => {
     }
     client.grpcClient = {
       log: jest.fn().mockImplementationOnce((event, cbFunc) => {
-        console.log("calling the log function")
         const response = new LogResponse(LogResponseStatus.accepted)
         cbFunc(null, response)
       })
@@ -99,7 +98,6 @@ describe('EventLoggingServiceClient', () => {
     }
     client.grpcClient = {
       log: jest.fn().mockImplementationOnce((event, cbFunc) => {
-        console.log("calling the log function")
         const error = new Error('test error')
         cbFunc(error, null)
       })
