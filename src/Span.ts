@@ -28,7 +28,7 @@ import {
   IEventRecorder, DefaultLoggerRecorder, DefaultSidecarRecorder
 } from './Recorder'
 import { EventLoggingServiceClient } from './transport/EventLoggingServiceClient';
-import Config from './lib/config'
+import { Config } from './lib/config'
 import Util from './lib/util'
 
 type RecorderKeys = 'defaultRecorder' | 'logRecorder' | 'auditRecorder' | 'traceRecorder'

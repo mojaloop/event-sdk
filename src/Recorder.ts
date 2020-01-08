@@ -1,6 +1,6 @@
 import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, EventMessage, EventMetadata, TypeEventMetadata, TypeMessageMetadata } from "./model/EventMessage";
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
-import Config from "./lib/config";
+import { Config } from "./lib/config";
 
 const Logger = require('@mojaloop/central-services-logger')
 

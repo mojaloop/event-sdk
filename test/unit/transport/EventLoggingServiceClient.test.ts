@@ -25,7 +25,6 @@
  ******/
 
 import Uuid from 'uuid/v4'
-import Sinon from 'sinon'
 
 import { EventLoggingServiceClient } from '../../../src/transport/EventLoggingServiceClient'
 import { EventMessage, LogResponse, LogResponseStatus } from '../../../src/model/EventMessage'

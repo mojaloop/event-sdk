@@ -26,7 +26,7 @@
 
 import Sinon, { SinonSandbox } from 'sinon'
 
-import Config from '../../src/lib/config'
+import { Config } from '../../src/lib/config'
 import { Recorders } from '../../src/Span'
 import { EventMessage, LogResponseStatus } from '../../src/model/EventMessage'
 

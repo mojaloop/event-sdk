@@ -30,37 +30,33 @@
 
 'use strict'
 
-import Sinon from 'sinon'
+
+//TODO: clean up all this!
 import Uuid from 'uuid/v4'
 
-import Config from '../../src/lib/config'
-import { Tracer } from "../../src/Tracer"
 import { EventLoggingServiceClient } from '../../src/transport/EventLoggingServiceClient'
-import { DefaultSidecarRecorder } from '../../src/Recorder'
-import { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions, EventMessage } from '../../src/model/EventMessage'
+import { EventMessage } from '../../src/model/EventMessage'
+
+// Mock out logging to make output less verbose
+jest.mock('@mojaloop/central-services-logger')
+import '@mojaloop/central-services-logger'
 
 const expectStringifyToMatch = (result: any, expected: any) => {
   return expect(JSON.stringify(result)).toBe(JSON.stringify(expected))
 }
 
-
-jest.mock('../../config/default.json', ()=>({
-    "ASYNC_OVERRIDE": false,
-    "SERVER_HOST": "localhost",
-    "SERVER_PORT": 50051,
-    "SIDECAR_DISABLED": true,
-    "SIDECAR_WITH_LOGGER": false,
-    "VENDOR_PREFIX": "acmevendor",
-    "TRACESTATE_HEADER_ENABLED": true,
-    "LOG_FILTER": ["audit:*", "log:info", "log:error", "log:warn", "log:debug"],
-    "LOG_METADATA_ONLY": true,
-    "TRACEID_PER_VENDOR": true  
-}), { virtual: true })
+const Config = jest.requireActual('../../src/lib/config')
+let mockConfig = Config
+jest.mock('../../src/lib/config', () => mockConfig)
 
 
-
-let sandbox: Sinon.SinonSandbox
 describe('Tracer', () => {
+
+  let Tracer: any
+  const DefaultSidecarRecorder = jest.requireActual('../../src/Recorder').DefaultSidecarRecorder
+  const { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
+  Tracer = jest.requireActual('../../src/Tracer').Tracer
+  
   const messageProtocol = {
     id: "xyz1234",
     to: "DFSP1",
@@ -84,33 +80,16 @@ describe('Tracer', () => {
     }
   }
 
-  beforeAll(() => {
-    sandbox = Sinon.createSandbox()
-  })
 
-  afterEach(() => {
-    sandbox.restore()
-  })
-
-  //TODO: enable tests if we can't test all conditions easily
-  // describe('getOwnVendorTracestate', () => {
-  //   it('should get the vendor tracestate', () => {
-  //     // Arrange
-      
-  //     // Act
-  //     const result = Tracer.getOwnVendorTracestate('testHeader')
-      
-  //     // Assert
-
-  //   })
+  // beforeEach(() => {
+  //   jest.clearAllMocks()
   // })
 
   describe('createChildSpanFromContext', () => {
     it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
       // Arrange
-      sandbox.mock(Config)
-      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
-      Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
+      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
 
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
@@ -126,9 +105,8 @@ describe('Tracer', () => {
 
     it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
       // Arrange
-      sandbox.mock(Config)
-      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
-      Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
 
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
@@ -198,9 +176,8 @@ describe('Tracer', () => {
     */
     it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is true and tracestate does not exist', () => {
       // Arrange
-      sandbox.mock(Config)
-      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
-      Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
@@ -216,9 +193,8 @@ describe('Tracer', () => {
 
     it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false and tracestate does not exist', () => {
       // Arrange
-      sandbox.mock(Config)
-      Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
-      Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
+      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
@@ -260,130 +236,142 @@ describe('Tracer', () => {
     })
   })
 
-  it('should create a parent span', async () => {
-    // Arrange
-    const configWithSidecar = {
-      EVENT_LOGGER_SIDECAR_DISABLED: false,
-      EVENT_LOGGER_SERVER_HOST: 'localhost',
-      EVENT_LOGGER_SERVER_PORT: 50051
-    }
-    const grpcClient = new EventLoggingServiceClient(configWithSidecar.EVENT_LOGGER_SERVER_HOST, configWithSidecar.EVENT_LOGGER_SERVER_PORT)
+  describe('default tests',() => {
+    beforeEach(() => {
+      jest.clearAllMocks()
 
-    const tracer = Tracer.createSpan('span', {}, { defaultRecorder: new DefaultSidecarRecorder(grpcClient) })
-    sandbox.stub(grpcClient.grpcClient, "log").callsFake((wireEvent: any, cb: any) => {
-      return cb(null, new LogResponse(LogResponseStatus.accepted))
-    });
-    
-    // Act
-    await tracer.info({ content: { messageProtocol } })
-    await tracer.debug({ content: { messageProtocol } })
-    await tracer.verbose({ content: { messageProtocol } })
-    await tracer.error({ content: { messageProtocol } })
-    await tracer.warning({ content: { messageProtocol } })
-    await tracer.performance({ content: { messageProtocol } })
-    
-    // Assert
-    expect(tracer.spanContext.service).toBe('span')
-  })
+      // Set up config mocks
+      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'acmevendor'
+      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.Config.EVENT_LOGGER_TRACEID_PER_VENDOR = true
+    })
 
-  it('should get the child span', async () => {
-    // Arrange
-    const tracer = Tracer.createSpan('service1')
-    tracer.setTags({ tag: 'value' })
-    
-    // Act
-    let child = tracer.getChild('service2')
+    it('should create a parent span', async () => {
+      // Arrange
+      const configWithSidecar = {
+        EVENT_LOGGER_SIDECAR_DISABLED: false,
+        EVENT_LOGGER_SERVER_HOST: 'localhost',
+        EVENT_LOGGER_SERVER_PORT: 50051
+      }
+      const eventClient = new EventLoggingServiceClient(configWithSidecar.EVENT_LOGGER_SERVER_HOST, configWithSidecar.EVENT_LOGGER_SERVER_PORT)
+      const tracer = Tracer.createSpan('span', {}, { defaultRecorder: new DefaultSidecarRecorder(eventClient) })
+      eventClient.grpcClient = {
+        log: jest.fn().mockImplementation((wireEvent: any, cb: any) =>
+          cb(null, new LogResponse(LogResponseStatus.accepted))
+        )
+      }
+      
+      // Act
+      await tracer.info({ content: { messageProtocol } })
+      await tracer.debug({ content: { messageProtocol } })
+      await tracer.verbose({ content: { messageProtocol } })
+      await tracer.error({ content: { messageProtocol } })
+      await tracer.warning({ content: { messageProtocol } })
+      await tracer.performance({ content: { messageProtocol } })
+      
+      // Assert
+      expect(tracer.spanContext.service).toBe('span')
+    })
 
-    // Assert
-    expect(tracer.spanContext.spanId).toBe(child.spanContext.parentSpanId)
-    expect(tracer.spanContext.traceId).toBe(child.spanContext.traceId)
-    expect(child.spanContext.service).toBe('service2')
-    expect(child.spanContext.tags).toHaveProperty('tag')
-    expect(child.spanContext.tags!.tag).toBe('value')
-    expect(child.spanContext.tags!.tracestate).toContain('acmevendor')
+    it('should get the child span', async () => {
+      // Arrange
+      const tracer = Tracer.createSpan('service1')
+      tracer.setTags({ tag: 'value' })
+      
+      // Act
+      let child = tracer.getChild('service2')
 
-    let spanContext = child.getContext()
-    let IIChild = Tracer.createChildSpanFromContext('service3', spanContext)
-    expect(child.spanContext.spanId).toBe(IIChild.spanContext.parentSpanId)
-    expect(tracer.spanContext.traceId).toBe(IIChild.spanContext.traceId)
-    expect(IIChild.spanContext.service).toBe('service3')
+      // Assert
+      expect(tracer.spanContext.spanId).toBe(child.spanContext.parentSpanId)
+      expect(tracer.spanContext.traceId).toBe(child.spanContext.traceId)
+      expect(child.spanContext.service).toBe('service2')
+      expect(child.spanContext.tags).toHaveProperty('tag')
+      expect(child.spanContext.tags!.tag).toBe('value')
+      expect(child.spanContext.tags!.tracestate).toContain('acmevendor')
 
-    let expected = Object.assign({}, messageProtocol, { metadata: { event: messageProtocol.metadata.event, trace: IIChild.getContext() } })
-    let newMessageA = await Tracer.injectContextToMessage(IIChild.getContext(), messageProtocol)
-    let newMessageB = IIChild.injectContextToMessage(messageProtocol)
-    expectStringifyToMatch(newMessageA, expected)
-    expectStringifyToMatch(newMessageB, expected)
+      let spanContext = child.getContext()
+      let IIChild = Tracer.createChildSpanFromContext('service3', spanContext)
+      expect(child.spanContext.spanId).toBe(IIChild.spanContext.parentSpanId)
+      expect(tracer.spanContext.traceId).toBe(IIChild.spanContext.traceId)
+      expect(IIChild.spanContext.service).toBe('service3')
 
-    let extractedContext = Tracer.extractContextFromMessage(newMessageA)
-    let IIIChild = Tracer.createChildSpanFromContext('service4', extractedContext)
-    expect(IIChild.spanContext.spanId).toBe(IIIChild.spanContext.parentSpanId)
-    expect(tracer.spanContext.traceId).toBe(IIIChild.spanContext.traceId)
-    expect(IIIChild.spanContext.service).toBe('service4')
+      let expected = Object.assign({}, messageProtocol, { metadata: { event: messageProtocol.metadata.event, trace: IIChild.getContext() } })
+      let newMessageA = await Tracer.injectContextToMessage(IIChild.getContext(), messageProtocol)
+      let newMessageB = IIChild.injectContextToMessage(messageProtocol)
+      expectStringifyToMatch(newMessageA, expected)
+      expectStringifyToMatch(newMessageB, expected)
 
-    let newMessageC = IIIChild.injectContextToMessage({ trace: {} })
-    let expected1 = { trace: IIIChild.getContext() }
-    expectStringifyToMatch(newMessageC, expected1)
+      let extractedContext = Tracer.extractContextFromMessage(newMessageA)
+      let IIIChild = Tracer.createChildSpanFromContext('service4', extractedContext)
+      expect(IIChild.spanContext.spanId).toBe(IIIChild.spanContext.parentSpanId)
+      expect(tracer.spanContext.traceId).toBe(IIIChild.spanContext.traceId)
+      expect(IIIChild.spanContext.service).toBe('service4')
 
-    let newMeta = await IIIChild.injectContextToMessage(new EventTraceMetadata({ service: '1' }))
-    expectStringifyToMatch(newMeta, IIIChild.getContext())
+      let newMessageC = IIIChild.injectContextToMessage({ trace: {} })
+      let expected1 = { trace: IIIChild.getContext() }
+      expectStringifyToMatch(newMessageC, expected1)
 
-    let expected2 = { message: { value: { metadata: { here: {}, trace: IIIChild.getContext() } } } }
-    let newMessageD = IIIChild.injectContextToMessage({ message: { value: { metadata: { here: {} } } } }, { path: 'message.value.metadata' })
-    expectStringifyToMatch(newMessageD, expected2)
+      let newMeta = await IIIChild.injectContextToMessage(new EventTraceMetadata({ service: '1' }))
+      expectStringifyToMatch(newMeta, IIIChild.getContext())
 
-    let newMessageE = Tracer.injectContextToMessage(IIIChild.getContext(), { trace: {} })
-    let expected3 = { trace: IIIChild.getContext() }
-    expectStringifyToMatch(newMessageE, expected3)
+      let expected2 = { message: { value: { metadata: { here: {}, trace: IIIChild.getContext() } } } }
+      let newMessageD = IIIChild.injectContextToMessage({ message: { value: { metadata: { here: {} } } } }, { path: 'message.value.metadata' })
+      expectStringifyToMatch(newMessageD, expected2)
 
-    let newMeta2 = await Tracer.injectContextToMessage(IIIChild.getContext(), new EventTraceMetadata({ service: '1' }))
-    expectStringifyToMatch(newMeta2, IIIChild.getContext())
+      let newMessageE = Tracer.injectContextToMessage(IIIChild.getContext(), { trace: {} })
+      let expected3 = { trace: IIIChild.getContext() }
+      expectStringifyToMatch(newMessageE, expected3)
 
-    let newMessageF = Tracer.injectContextToMessage(IIIChild.getContext(), { message: { value: { metadata: { here: {} } } } }, { path: 'message.value.metadata' })
-    let expected4 = { message: { value: { metadata: { here: {}, trace: IIIChild.getContext() } } } }
-    expectStringifyToMatch(newMessageF, expected4)
+      let newMeta2 = await Tracer.injectContextToMessage(IIIChild.getContext(), new EventTraceMetadata({ service: '1' }))
+      expectStringifyToMatch(newMeta2, IIIChild.getContext())
 
-    let header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {} })
-    expect(header.headers.traceparent).not.toBeUndefined()
-    header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: { tracestate: `m=dadfafa,j=123,acmevendor=12345` } })
-    expect(header.headers.traceparent).not.toBeUndefined()
+      let newMessageF = Tracer.injectContextToMessage(IIIChild.getContext(), { message: { value: { metadata: { here: {} } } } }, { path: 'message.value.metadata' })
+      let expected4 = { message: { value: { metadata: { here: {}, trace: IIIChild.getContext() } } } }
+      expectStringifyToMatch(newMessageF, expected4)
 
-    header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } })
-    expect(header.headers.tracestate).toContain('mojaloop')
+      let header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {} })
+      expect(header.headers.traceparent).not.toBeUndefined()
+      header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: { tracestate: `m=dadfafa,j=123,acmevendor=12345` } })
+      expect(header.headers.traceparent).not.toBeUndefined()
 
-    header = await tracer.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } })
-    expect(header.headers.traceparent).not.toBeUndefined()
-    expect(header.headers.tracestate).toContain('mojaloop')
+      header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } })
+      expect(header.headers.tracestate).toContain('mojaloop')
 
-    header = await tracer.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
-    expect(header.headers['X-B3-SpanId']).not.toBeUndefined()
+      header = await tracer.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } })
+      expect(header.headers.traceparent).not.toBeUndefined()
+      expect(header.headers.tracestate).toContain('mojaloop')
 
-    header = await IIChild.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
-    expect(header.headers['X-B3-SpanId']).not.toBeUndefined()
+      header = await tracer.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
+      expect(header.headers['X-B3-SpanId']).not.toBeUndefined()
 
-    header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {} })
-    let newContextA = Tracer.extractContextFromHttpRequest(header)
-    expect(newContextA).not.toBeUndefined()
+      header = await IIChild.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
+      expect(header.headers['X-B3-SpanId']).not.toBeUndefined()
 
-    header = await IIChild.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
-    let newContextB = Tracer.extractContextFromHttpRequest(header, HttpRequestOptions.xb3)
-    expect(newContextB).not.toBeUndefined()
-    
-    header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {tracestate: 'mojaloop=12312312', traceparent: '00-1234567890123456-12345678-01'} })
-    let newContextC = Tracer.extractContextFromHttpRequest(header)
-    expect(newContextC).not.toBeUndefined()
+      header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {} })
+      let newContextA = Tracer.extractContextFromHttpRequest(header)
+      expect(newContextA).not.toBeUndefined()
 
-    let finishtime = new Date()
-    await tracer.finish('message', undefined, finishtime)
-    await IIChild.finish()
-    
-    // Throws when new trying to finish already finished trace
-    let action = async () => await tracer.finish()
-    await expect(action()).rejects.toThrowError('span already finished')
+      header = await IIChild.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
+      let newContextB = Tracer.extractContextFromHttpRequest(header, HttpRequestOptions.xb3)
+      expect(newContextB).not.toBeUndefined()
+      
+      header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {tracestate: 'mojaloop=12312312', traceparent: '00-1234567890123456-12345678-01'} })
+      let newContextC = Tracer.extractContextFromHttpRequest(header)
+      expect(newContextC).not.toBeUndefined()
 
-    action = async () => await tracer.audit(<EventMessage>newMessageA)
-    await expect(action()).rejects.toThrowError('span finished. no further actions allowed')
-    
-    const logresult = await child.audit(<EventMessage>newMessageA)
-    expect(logresult).not.toBeUndefined()
+      let finishtime = new Date()
+      await tracer.finish('message', undefined, finishtime)
+      await IIChild.finish()
+      
+      // Throws when new trying to finish already finished trace
+      let action = async () => await tracer.finish()
+      await expect(action()).rejects.toThrowError('span already finished')
+
+      action = async () => await tracer.audit(<EventMessage>newMessageA)
+      await expect(action()).rejects.toThrowError('span finished. no further actions allowed')
+      
+      const logresult = await child.audit(<EventMessage>newMessageA)
+      expect(logresult).not.toBeUndefined()
+    })
   })
 })
