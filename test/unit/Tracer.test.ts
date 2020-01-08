@@ -30,28 +30,25 @@
 
 'use strict'
 
+// Mock out logging to make output less verbose
+jest.mock('@mojaloop/central-services-logger')
 
-//TODO: clean up all this!
 import Uuid from 'uuid/v4'
+import '@mojaloop/central-services-logger'
 
 import { EventLoggingServiceClient } from '../../src/transport/EventLoggingServiceClient'
 import { EventMessage } from '../../src/model/EventMessage'
 
-// Mock out logging to make output less verbose
-jest.mock('@mojaloop/central-services-logger')
-import '@mojaloop/central-services-logger'
 
 const expectStringifyToMatch = (result: any, expected: any) => {
   return expect(JSON.stringify(result)).toBe(JSON.stringify(expected))
 }
 
 const Config = jest.requireActual('../../src/lib/config')
-let mockConfig = Config
+let mockConfig = Config.default
 jest.mock('../../src/lib/config', () => mockConfig)
 
-
 describe('Tracer', () => {
-
   let Tracer: any
   const DefaultSidecarRecorder = jest.requireActual('../../src/Recorder').DefaultSidecarRecorder
   const { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
@@ -81,15 +78,11 @@ describe('Tracer', () => {
   }
 
 
-  // beforeEach(() => {
-  //   jest.clearAllMocks()
-  // })
-
   describe('createChildSpanFromContext', () => {
     it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
       // Arrange
-      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
-      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+      mockConfig.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
+      mockConfig.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
 
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
@@ -105,8 +98,8 @@ describe('Tracer', () => {
 
     it('creates a child span without the vendor prefix tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false', () => {
       // Arrange
-      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
-      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
+      mockConfig.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.EVENT_LOGGER_VENDOR_PREFIX = "TEST_VENDOR"
 
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
@@ -176,8 +169,8 @@ describe('Tracer', () => {
     */
     it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is true and tracestate does not exist', () => {
       // Arrange
-      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
-      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      mockConfig.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
@@ -193,8 +186,8 @@ describe('Tracer', () => {
 
     it('has no tracestate tag when EVENT_LOGGER_TRACESTATE_HEADER_ENABLED is false and tracestate does not exist', () => {
       // Arrange
-      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
-      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
+      mockConfig.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = false
+      mockConfig.EVENT_LOGGER_VENDOR_PREFIX = 'TEST_VENDOR'
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const request = Tracer.injectContextToHttpRequest(tracer.getContext(), { headers: { traceparent: '00-1234567890123456-12345678-01' } })
@@ -241,9 +234,9 @@ describe('Tracer', () => {
       jest.clearAllMocks()
 
       // Set up config mocks
-      mockConfig.Config.EVENT_LOGGER_VENDOR_PREFIX = 'acmevendor'
-      mockConfig.Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
-      mockConfig.Config.EVENT_LOGGER_TRACEID_PER_VENDOR = true
+      mockConfig.EVENT_LOGGER_VENDOR_PREFIX = 'acmevendor'
+      mockConfig.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED = true
+      mockConfig.EVENT_LOGGER_TRACEID_PER_VENDOR = true
     })
 
     it('should create a parent span', async () => {

@@ -2,7 +2,7 @@ import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpReque
 
 import { Span, ContextOptions, Recorders, setHttpHeader } from "./Span"
 import Util from './lib/util'
-import { Config } from "./lib/config";
+import Config from "./lib/config";
 import { setMaxListeners } from "cluster";
 
 const _ = require('lodash');
@@ -49,7 +49,7 @@ class Tracer implements ATracer {
    * @param defaultTagsSetter optional default tags setter method.
    */
 
-  static createSpan(service: string, tags?: TraceTags, recorders?: Recorders, defaultTagsSetter?: Span['defaultTagsSetter']): Span {
+  static createSpan(service: string, tags?: TraceTags, recorders?: Recorders, defaultTagsSetter?: Span['defaultTagsSetter']): Span {``    
     return new Span(new EventTraceMetadata({ service, tags }), recorders, defaultTagsSetter)
   }
   /**
