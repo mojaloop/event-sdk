@@ -23,7 +23,13 @@ abstract class ATracer {
 }
 
 const tracestateDecoder = (vendor: string | undefined, tracestate: string): { [key: string]: string } => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_tracestateDecoder',
+      'Get trace state decoder',
+      ['success']
+  ).startTimer()
   vendor = !!vendor ? vendor : 'unknownVendor'
+  histTimerEnd({success: true})
   return {
     vendor,
     parentId: tracestate
@@ -34,6 +40,11 @@ const tracestateDecoder = (vendor: string | undefined, tracestate: string): { [k
 class Tracer implements ATracer {
 
   private static getOwnVendorTracestate = (tracestateHeader: string): { [key: string] : string } | undefined => {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_getOwnVendorTracestate',
+        'Get own vendor trace state',
+        ['success']
+    ).startTimer()
     let tracestateArray = (tracestateHeader.split(','))
     let resultMap: { [key: string]: any } = {}
   
@@ -47,6 +58,7 @@ class Tracer implements ATracer {
       }
     }
     const tracestate = (Config.EVENT_LOGGER_VENDOR_PREFIX in resultMap) ? resultMap[Config.EVENT_LOGGER_VENDOR_PREFIX] : {}
+    histTimerEnd({success: true})
     return tracestateDecoder(tracestate.vendor, tracestate.parentId)
   }
 
@@ -134,6 +146,11 @@ class Tracer implements ATracer {
    * @param injectOptions type and path of the carrier. Type is not implemented yet. Path is the path to the trace context.
    */
   static injectContextToMessage(context: TypeSpanContext, carrier: { [key: string]: any }, injectOptions: ContextOptions = {}): { [key: string]: any } {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_injectContextToMessage',
+        'Injects trace context into a carrier with optional path.',
+        ['success']
+    ).startTimer()
     let result = _.cloneDeep(carrier)
     let { path } = injectOptions // type not implemented yet
     if (carrier instanceof EventMessage || (('metadata' in carrier))) path = 'metadata'
@@ -142,6 +159,7 @@ class Tracer implements ATracer {
       Object.assign(result, { trace: context })
     }
     else _.merge(_.get(result, path), { trace: context })
+    histTimerEnd({success: true})
     return result
   }
   /**
@@ -152,8 +170,14 @@ class Tracer implements ATracer {
    */
 
   static injectContextToHttpRequest(context: TypeSpanContext, request: { [key: string]: any }, type: HttpRequestOptions = HttpRequestOptions.w3c): { [key: string]: any } {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_injectContextToHttpRequest',
+        'Injects trace context into a http request headers.',
+        ['success']
+    ).startTimer()
     let result = _.cloneDeep(request)
     result.headers = setHttpHeader(context, type, result.headers)
+    histTimerEnd({success: true})
     return result
   }
 
@@ -164,6 +188,11 @@ class Tracer implements ATracer {
    * @param extractOptions type and path of the carrier. Type is not implemented yet. Path is the path to the trace context.
    */
   static extractContextFromMessage(carrier: { [key: string]: any }, extractOptions: ContextOptions = {}): TypeSpanContext {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_extractContextFromMessage',
+        'Extracts trace context from a carrier (ex: kafka message, event message, metadata, trace)',
+        ['success']
+    ).startTimer()
     let spanContext
     let { path } = extractOptions // type not implemented yet
     if (carrier instanceof EventMessage || (('metadata' in carrier) && 'trace' in carrier.metadata)) {
@@ -172,10 +201,16 @@ class Tracer implements ATracer {
       path = 'trace'
     }
     spanContext = new EventTraceMetadata(<TypeSpanContext>_.get(carrier, path!, carrier))
+    histTimerEnd({success: true})
     return <TypeSpanContext>spanContext
   }
 
   static extractContextFromHttpRequest(request: { [key: string] : any }, type: HttpRequestOptions = HttpRequestOptions.w3c): TypeSpanContext | undefined {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_extractContextFromHttpRequest',
+        'Extract context from http request',
+        ['success']
+    ).startTimer()
     let spanContext
       
     switch (type) {
@@ -183,6 +218,7 @@ class Tracer implements ATracer {
         let result:{ [key: string]: string } = {}
         const requestHasXB3headers = !!request.headers && Object.keys(request.headers).some(key => !!key.toLowerCase().match(/x-b3-/))
         if (!requestHasXB3headers) {
+          histTimerEnd({success: true})
           return undefined
         }
         for (let [ key, value ] of Object.entries(request.headers)) {
@@ -193,11 +229,13 @@ class Tracer implements ATracer {
           }
         }
         spanContext = new EventTraceMetadata(result)
+        histTimerEnd({success: true})
         return <TypeSpanContext>spanContext
       }
       case HttpRequestOptions.w3c:
       default: {
         if (!request.headers || !request.headers.traceparent) {
+          histTimerEnd({success: true})
           return undefined
         }
         const context = TraceParent.fromString(request.headers.traceparent)
@@ -211,6 +249,7 @@ class Tracer implements ATracer {
         if (request.headers.tracestate || Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
           spanContext = {...spanContext, ...{ tags: { tracestate: request.headers.tracestate } }}
         }
+        histTimerEnd({success: true})
         return <TypeSpanContext>spanContext
       }
     }

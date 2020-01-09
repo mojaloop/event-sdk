@@ -137,10 +137,16 @@ class Span implements Partial<ISpan> {
     spanContext: EventTraceMetadata,
     recorders?: Recorders,
     defaultTagsSetter?: (message: TypeOfMessage) => any) {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_SpanConstructor',
+        'Creates new span. Normally this is not used directly, but by a Tracer.createSpan method',
+        ['success']
+    ).startTimer()
     this.spanContext = Object.freeze(spanContext)
     this.defaultTagsSetter = defaultTagsSetter ? defaultTagsSetter : this.defaultTagsSetter
     this.recorders = recorders ? recorders : { defaultRecorder }
     this.defaultTagsSetter()
+    histTimerEnd({ success: true })
     return this
   }
 
@@ -150,8 +156,14 @@ class Span implements Partial<ISpan> {
    */
 
    defaultTagsSetter(message?: TypeOfMessage): Span {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_defaultTagsSetter',
+        'A method to set tags by default.',
+        ['success']
+    ).startTimer()
     const w3cHeaders = getTracestateTag(this.spanContext)
     !!w3cHeaders && this.setTags({ ...this.spanContext.tags, ...w3cHeaders })
+    histTimerEnd({ success: true })
     return this
   }
 
@@ -196,10 +208,16 @@ class Span implements Partial<ISpan> {
    * @param injectOptions type and path of the carrier. Type is not implemented yet. Path is the path to the trace context.
    */
   injectContextToMessage(carrier: { [key: string]: any }, injectOptions: ContextOptions = {}): { [key: string]: any } {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_injectContextToMessage',
+        'Injects trace context into a carrier with optional path.',
+        ['success']
+    ).startTimer()
     let result = _.cloneDeep(carrier)
     let { path } = injectOptions // type not implemented yet
     if (carrier instanceof EventMessage || (('metadata' in carrier))) path = 'metadata'
     else if (carrier instanceof EventTraceMetadata) {
+      histTimerEnd({ success: true })
       return Promise.resolve(this.spanContext)
     }
     if (!path) {
@@ -207,6 +225,7 @@ class Span implements Partial<ISpan> {
     } else {
       _.merge(_.get(result, path), { trace: this.spanContext })
     }
+    histTimerEnd({ success: true })
     return result
   }
 
@@ -217,8 +236,14 @@ class Span implements Partial<ISpan> {
    */
 
   injectContextToHttpRequest(request: { [key: string]: any }, type: HttpRequestOptions = HttpRequestOptions.w3c): { [key: string]: any } {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_injectContextToHttpRequest',
+        'Injects trace context into a http request headers.',
+        ['success']
+    ).startTimer()
     let result = _.cloneDeep(request)
     result.headers = setHttpHeader(this.spanContext, type, result.headers)
+    histTimerEnd({ success: true })
     return result
   }
 
@@ -253,10 +278,12 @@ class Span implements Partial<ISpan> {
         ['success']
     ).startTimer()
     if (this.spanContext.finishTimestamp) {
+      histTimerEnd({ success: true })
       return Promise.reject(new Error('span already finished'))
     }
     let spanContext = this._finishSpan(finishTimestamp).getContext()
     await this.trace(message, spanContext, state)
+    histTimerEnd({ success: true })
     return Promise.resolve(this)
   }
 
@@ -265,6 +292,11 @@ class Span implements Partial<ISpan> {
    * @param finishTimestamp optional parameter for the finish time. If omitted, current time is used.
    */
   private _finishSpan(finishTimestamp?: string | Date): this {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_finishSpan',
+        'Finishes the trace by adding finish timestamp to the current span.',
+        ['success']
+    ).startTimer()
     let newContext: TypeSpanContext = <TypeSpanContext>Object.assign({}, this.spanContext)
     if (finishTimestamp instanceof Date) {
       newContext.finishTimestamp = finishTimestamp.toISOString() // ISO 8601
@@ -274,6 +306,7 @@ class Span implements Partial<ISpan> {
       newContext.finishTimestamp = finishTimestamp
     }
     this.spanContext = Object.freeze(new EventTraceMetadata(newContext))
+    histTimerEnd({ success: true })
     return this
   }
 
@@ -484,6 +517,11 @@ class Span implements Partial<ISpan> {
     type: TypeEventTypeAction['type'],
     _action?: TypeEventTypeAction['action'],
     state: EventStateMetadata = EventStateMetadata.success()): EventMessage => {
+    const histTimerEnd = Metrics.getHistogram(
+        'eventSdk_createEventMessage',
+        'Helper function to create event message, based on message and event types, action and state.',
+        ['success']
+    ).startTimer()
     let defaults = getDefaults(type)
     let action = _action ? _action : defaults.action
     let messageToLog
@@ -507,6 +545,7 @@ class Span implements Partial<ISpan> {
       // } else {
       //   messageToLog = new EventMessage(<TypeEventMessage>message)
     }
+    histTimerEnd({ success: true })
     return Object.assign(messageToLog, {
       metadata: {
         event: defaults.eventMetadataCreator({
@@ -525,26 +564,35 @@ interface IDefaultActions {
 }
 
 const getDefaults = (type: EventType): IDefaultActions => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_getDefaults',
+      'Helper function to create event message, based on message and event types, action and state.',
+      ['success']
+  ).startTimer()
   switch (type) {
     case EventType.audit: {
+      histTimerEnd({ success: true })
       return {
         action: AuditEventAction.default,
         eventMetadataCreator: EventMetadata.audit
       }
     }
     case EventType.trace: {
+      histTimerEnd({ success: true })
       return {
         action: TraceEventAction.span,
         eventMetadataCreator: EventMetadata.trace
       }
     }
     case EventType.log: {
+      histTimerEnd({ success: true })
       return {
         action: LogEventAction.info,
         eventMetadataCreator: EventMetadata.log
       }
     }
   }
+  histTimerEnd({ success: true })
   return {
     action: NullEventAction.undefined,
     eventMetadataCreator: EventMetadata.log
@@ -552,6 +600,11 @@ const getDefaults = (type: EventType): IDefaultActions => {
 }
 
 const setHttpHeader = (context: TypeSpanContext, type: HttpRequestOptions, headers: { [key: string]: any }): { [key: string]: any } => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_setHttpHeader',
+      'Helper function to set http header.',
+      ['success']
+  ).startTimer()
   const { traceId, parentSpanId, spanId, flags, sampled } = context
 
   switch (type) {
@@ -565,12 +618,14 @@ const setHttpHeader = (context: TypeSpanContext, type: HttpRequestOptions, heade
         'X-B3-Version': '0'
       }
       let result = parentSpanId ? Object.assign({ 'X-B3-ParentSpanId': parentSpanId }, XB3headers) : XB3headers
+      histTimerEnd({ success: true })
       return Object.assign(headers, result)
     }
 
     case HttpRequestOptions.w3c:
     default: {
       const tracestate = headers.tracestate ? createW3CTracestate(context, headers.tracestate) : (context.tags && context.tags.tracestate) ? context.tags.tracestate : null
+      histTimerEnd({ success: true })
       return _.pickBy({
         ...headers,
         ...{
@@ -590,8 +645,14 @@ const encodeTracestate = (context: TypeSpanContext): { [key: string]: string } =
 }
 
 const createW3CTracestate = (spanContext: TypeSpanContext, tracestate?: string): string => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_createW3CTracestate',
+      'Helper function to create W3C trace state.',
+      ['success']
+  ).startTimer()
   const { vendor, opaqueValue } = encodeTracestate(spanContext)
   if (!tracestate && Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
+    histTimerEnd({ success: true })
     return `${vendor}=${opaqueValue}`
   }
   let tracestateArray = (tracestate!.split(','))
@@ -615,10 +676,16 @@ const createW3CTracestate = (spanContext: TypeSpanContext, tracestate?: string):
     tracestateArray.unshift(`${vendor}=${opaqueValue}`)
     result = tracestateArray.join(',')
   }
+  histTimerEnd({ success: true })
   return result
 }
 
 const createW3Ctreaceparent = (spanContext: TypeSpanContext): string => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_createW3Ctreaceparent',
+      'Helper function to create W3C treace parent.',
+      ['success']
+  ).startTimer()
   const { traceId, parentSpanId, spanId, flags, sampled } = spanContext
   const version = Buffer.alloc(1).fill(0)
   const flagsForBuff = (flags && sampled) ? (flags | sampled) : flags ? flags : sampled ? sampled : 0x00
@@ -631,17 +698,27 @@ const createW3Ctreaceparent = (spanContext: TypeSpanContext): string => {
     ? new TraceParent(Buffer.concat([version, traceIdBuff, spanIdBuff, flagsBuffer, parentSpanIdBuff]))
     : new TraceParent(Buffer.concat([version, traceIdBuff, spanIdBuff, flagsBuffer]))
 
+  histTimerEnd({ success: true })
   return W3CHeaders.toString()
 }
 
 const getTracestateTag = (spanContext: TypeSpanContext): { [ key: string ]: string } | false => {
+  const histTimerEnd = Metrics.getHistogram(
+      'eventSdk_getTracestateTag',
+      'Helper function to get trace state tag.',
+      ['success']
+  ).startTimer()
   let tracestate
   if (!!Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED || (!!spanContext.tags && !!spanContext.tags!.tracestate)) {
     let currentTracestate = undefined
     if (!!spanContext.tags && !!spanContext.tags.tracestate) currentTracestate = spanContext.tags.tracestate
     tracestate = createW3CTracestate(spanContext, currentTracestate)
-    if(tracestate) return { tracestate }
+    if(tracestate) {
+      histTimerEnd({ success: true })
+      return { tracestate }
+    }
   }
+  histTimerEnd({ success: false })
   return false
 }
 
