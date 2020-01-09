@@ -59,6 +59,7 @@
   "homepage": "https://github.com/mojaloop/event-sdk#readme",
   "dependencies": {
     "@grpc/proto-loader": "0.5.3",
+    "@mojaloop/central-services-logger": "8.8.0",
     "@types/protobufjs": "6.0.0",
     "brototype": "0.0.6",
     "error-callsites": "2.0.2",

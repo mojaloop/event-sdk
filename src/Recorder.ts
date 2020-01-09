@@ -2,7 +2,7 @@ import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, Even
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
 import Config from "./lib/config";
 
-const Logger = require('./lib/logger')
+const Logger = require('@mojaloop/central-services-logger')
 
 /**
  * Describes Event Recorder interface
@@ -47,11 +47,11 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
         action = LogEventAction.info
       }
 
-      if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
-        Logger.log(action, JSON.stringify(message, null, 2))
-      } else {
-        Logger.log(type, JSON.stringify(message, null, 2))
-      }
+      // if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
+        Logger.log('event', `${action}.${type} - ${JSON.stringify(message, null, 2)}`)
+      // } else {
+      //   Logger.log('event', `event.${type} - ${JSON.stringify(message, null, 2)}`)
+      // }
 
       resolve({ status: LogResponseStatus.accepted })
     } catch(e) {

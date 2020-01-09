@@ -3,7 +3,6 @@
   "SERVER_HOST": "localhost",
   "SERVER_PORT": 50055,
   "SIDECAR_DISABLED": true,
-  "SIDECAR_WITH_LOGGER": false,
   "VENDOR_PREFIX": "acmevendor",
   "TRACESTATE_HEADER_ENABLED": false,
   "LOG_FILTER": "audit:*, log:info, log:error, log:warn",
