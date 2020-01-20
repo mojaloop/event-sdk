@@ -1,6 +1,7 @@
 import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpRequestOptions } from "./model/EventMessage";
 
-import { Span, ContextOptions, Recorders, setHttpHeader, getTracestateTag } from "./Span"
+import { Span, ContextOptions, Recorders, setHttpHeader } from "./Span"
+import Util from './lib/util'
 import Config from "./lib/config";
 import { setMaxListeners } from "cluster";
 
@@ -21,21 +22,6 @@ abstract class ATracer {
   static extractContextFromMessage: (message: { [key: string]: any }, path?: string) => TypeSpanContext
   static extractContextFromHttpRequest: (request: any, type?: HttpRequestOptions, tracestateDecoder?: (tracestate: string) => string | {[key: string]: string} ) => TypeSpanContext | undefined
 }
-
-const tracestateDecoder = (vendor: string | undefined, tracestate: string): { [key: string]: string } => {
-  const histTimerEnd = Metrics.getHistogram(
-      'eventSdk_tracestateDecoder',
-      'Get trace state decoder',
-      ['success']
-  ).startTimer()
-  vendor = !!vendor ? vendor : 'unknownVendor'
-  histTimerEnd({success: true})
-  return {
-    vendor,
-    parentId: tracestate
-  }
-}
-
 
 class Tracer implements ATracer {
 
@@ -59,7 +45,7 @@ class Tracer implements ATracer {
     }
     const tracestate = (Config.EVENT_LOGGER_VENDOR_PREFIX in resultMap) ? resultMap[Config.EVENT_LOGGER_VENDOR_PREFIX] : {}
     histTimerEnd({success: true})
-    return tracestateDecoder(tracestate.vendor, tracestate.parentId)
+    return Util.tracestateDecoder(tracestate.vendor, tracestate.parentId)
   }
 
     /**
@@ -245,7 +231,7 @@ class Tracer implements ATracer {
           spanId: context.id,
           flags: context.flags,
           sampled 
-       })
+        })
         if (request.headers.tracestate || Config.EVENT_LOGGER_TRACESTATE_HEADER_ENABLED) {
           spanContext = {...spanContext, ...{ tags: { tracestate: request.headers.tracestate } }}
         }

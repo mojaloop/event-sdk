@@ -31,11 +31,9 @@ const grpc = require('grpc')
 const Metrics = require('@mojaloop/central-services-metrics')
 
 class EventLoggingServiceClient {
-
   grpcClient : any;
 
-  constructor(host : string, port: number ) {
-
+  constructor(host: string, port: number) {
     let eventLoggerService = loadEventLoggerService();
 
     let client = new eventLoggerService(`${host}:${port}`, grpc.credentials.createInsecure())
@@ -53,11 +51,12 @@ class EventLoggingServiceClient {
           ['success']
       ).startTimer()
       let wireEvent: any = Object.assign({}, event);
-      if ( !event.content ) {
+      if (!event.content) {
         throw new Error('Invalid eventMessage: content is mandatory');
       }
+
       try {
-      wireEvent.content = toAny(event.content, event.type);
+        wireEvent.content = toAny(event.content, event.type);
 
       let wireEventCopy : any = JSON.parse(JSON.stringify(wireEvent));
       if (wireEventCopy.content.value.type === 'Buffer') {
