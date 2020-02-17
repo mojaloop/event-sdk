@@ -28,6 +28,7 @@ import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
 const grpc = require('grpc')
+const Metrics = require('@mojaloop/central-services-metrics')
 
 class EventLoggingServiceClient {
   grpcClient : any;
@@ -44,6 +45,11 @@ class EventLoggingServiceClient {
    */
   log = async (event: EventMessage): Promise<LogResponse> => {
     return new Promise((resolve, reject) => {
+      const histTimerEnd = Metrics.getHistogram(
+          'eventSdk_log',
+          'Log an event',
+          ['success']
+      ).startTimer()
       let wireEvent: any = Object.assign({}, event);
       if (!event.content) {
         throw new Error('Invalid eventMessage: content is mandatory');
@@ -52,22 +58,24 @@ class EventLoggingServiceClient {
       try {
         wireEvent.content = toAny(event.content, event.type);
 
-        let wireEventCopy: any = JSON.parse(JSON.stringify(wireEvent));
-        if (wireEventCopy.content.value.type === 'Buffer') {
-          wireEventCopy.content.value = `Buffer(${wireEventCopy.content.value.data.length})`
-        }
-        Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
-        this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
-          Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
-          if (error) {
-            reject(error); 
-          }
-          resolve(response);
-        })
-      } catch (e) {
-        Logger.error(e)
-        reject(e)
+      let wireEventCopy : any = JSON.parse(JSON.stringify(wireEvent));
+      if (wireEventCopy.content.value.type === 'Buffer') {
+        wireEventCopy.content.value = `Buffer(${wireEventCopy.content.value.data.length})`
       }
+      Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+      this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
+        Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+        if ( error ) {
+          reject(error); 
+        }
+        resolve(response);
+      })
+    } catch (e) {
+      Logger.error(e)
+      histTimerEnd({ success: false })
+      reject(e)
+    }
+    histTimerEnd({ success: true })
     })
   }
 }

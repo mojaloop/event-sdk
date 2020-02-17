@@ -8,5 +8,20 @@
   "TRACESTATE_HEADER_ENABLED": false,
   "LOG_FILTER": ["audit:*", "log:info", "log:error", "log:warn"],
   "LOG_METADATA_ONLY": true,
-  "TRACEID_PER_VENDOR": true
+  "TRACEID_PER_VENDOR": true,
+  "INSTRUMENTATION": {
+    "METRICS": {
+      "DISABLED": false,
+      "labels": {
+        "fspId": "*"
+      },
+      "config": {
+        "timeout": 5000,
+        "prefix": "moja_event-sdk_",
+        "defaultLabels": {
+          "serviceName": "event-sdk"
+        }
+      }
+    }
+  }
 }
