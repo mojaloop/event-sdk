@@ -341,7 +341,7 @@ workflows:
             branches:
               ignore:
                 - /.*/
-      - build-snapshot:
+      - build-perf:
           context: org-global
           requires:
             - setup
