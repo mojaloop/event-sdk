@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/event-sdk",
-  "version": "9.3.0",
+  "version": "9.3.0-snapshot",
   "description": "Shared code for Event Logging",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -64,7 +64,7 @@
     "error-callsites": "2.0.2",
     "grpc": "1.24.2",
     "lodash": "4.17.15",
-    "luxon": "^1.22.0",
+    "luxon": "1.22.0",
     "moment": "2.24.0",
     "parse-strings-in-object": "2.0.0",
     "protobufjs": "6.8.8",
