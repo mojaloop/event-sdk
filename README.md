@@ -77,6 +77,6 @@ Tracestate header example value: `acmevendor=eyJzcGFuSWQiOiI2Njg2Nzk1MDBiMGUzYzQ
 
 ## Usage
 
-Instrumented services should be part of a configuration which includes the [event sidecar](https://github.com/mojaloop/event-sidecar) and [event-streaming-processor](https://github.com/mojaloop/event-streaming-processor). Detailed architecture overview can be found [here](https://mojaloop.io/documentation/mojaloop-technical-overview/event-framework/)
+Instrumented services should be part of a configuration which includes the [event sidecar](https://github.com/mojaloop/event-sidecar) and [event-streaming-processor](https://github.com/mojaloop/event-streaming-processor). Detailed architecture overview can be found [here](https://docs.mojaloop.io/documentation/mojaloop-technical-overview/event-framework/)
 
 Examples of usage of the SDK can be found in the `src/examples` directory of this repo: [Javascript example](src/examples/js_app.js) and [TypeScript example](src/examples/ts_app.ts).
