@@ -61,7 +61,7 @@
     "@mojaloop/central-services-logger": "10.6.0",
     "brototype": "0.0.6",
     "error-callsites": "2.0.3",
-    "grpc": "1.24.3",
+    "grpc": "1.24.9",
     "lodash": "4.17.19",
     "moment": "2.27.0",
     "parse-strings-in-object": "2.0.0",
