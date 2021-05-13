@@ -12,5 +12,8 @@ module.exports = {
       branches: 90,
       lines: 90
     }
-  }
+  },
+  coveragePathIgnorePatterns: [
+    "src/index.ts"
+  ]
 }

@@ -1,6 +1,5 @@
 {
   "reject": [
-    "serialize-error",
-    "typescript"
+    "serialize-error"
   ]
 }
