@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/event-sdk",
-  "version": "10.6.2",
+  "version": "10.7.0",
   "description": "Shared code for Event Logging",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -69,7 +69,7 @@
     "parse-strings-in-object": "2.0.0",
     "protobufjs": "6.11.2",
     "rc": "1.2.8",
-    "serialize-error": "4.1.0",
+    "serialize-error": "8.1.0",
     "sinon": "10.0.0",
     "traceparent": "1.0.0",
     "tslib": "2.2.0",
