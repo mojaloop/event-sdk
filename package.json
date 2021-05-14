@@ -35,7 +35,7 @@
     "warn-pre-commit",
     "dep:check",
     "build",
-    "git:standardFix",
+    "lint",
     "test:unit"
   ],
   "repository": {
