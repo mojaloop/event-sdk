@@ -1,0 +1,80 @@
+{
+  "decisions": {
+    "1064646|grpc>@mapbox/node-pre-gyp>node-fetch": {
+      "decision": "fix",
+      "madeAt": 1648572054247
+    },
+    "1065029|winston>@dabh/diagnostics>colorspace>color>color-string": {
+      "decision": "fix",
+      "madeAt": 1648572063889
+    },
+    "1065029|@mojaloop/central-services-logger>winston>@dabh/diagnostics>colorspace>color>color-string": {
+      "decision": "fix",
+      "madeAt": 1648572063889
+    },
+    "1067198|grpc>@mapbox/node-pre-gyp>tar": {
+      "decision": "fix",
+      "madeAt": 1648572071596
+    },
+    "1067201|grpc>@mapbox/node-pre-gyp>tar": {
+      "decision": "fix",
+      "madeAt": 1648572071596
+    },
+    "1067204|grpc>@mapbox/node-pre-gyp>tar": {
+      "decision": "fix",
+      "madeAt": 1648572071596
+    },
+    "1067207|grpc>@mapbox/node-pre-gyp>tar": {
+      "decision": "fix",
+      "madeAt": 1648572071596
+    },
+    "1067211|grpc>@mapbox/node-pre-gyp>tar": {
+      "decision": "fix",
+      "madeAt": 1648572071596
+    },
+    "1067285|rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1648572079086
+    },
+    "1067285|@mojaloop/central-services-logger>rc>minimist": {
+      "decision": "fix",
+      "madeAt": 1648572079086
+    },
+    "1067300|grpc>@mapbox/node-pre-gyp>npmlog>gauge>wide-align>string-width>strip-ansi>ansi-regex": {
+      "decision": "fix",
+      "madeAt": 1648572087003
+    },
+    "1067302|@grpc/proto-loader>yargs>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    },
+    "1067302|@grpc/proto-loader>yargs>cliui>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    },
+    "1067302|@grpc/proto-loader>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    },
+    "1067302|@grpc/proto-loader>yargs>cliui>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    },
+    "1067302|@grpc/proto-loader>yargs>cliui>wrap-ansi>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    },
+    "1067302|grpc>@mapbox/node-pre-gyp>npmlog>gauge>wide-align>string-width>strip-ansi>ansi-regex": {
+      "decision": "ignore",
+      "madeAt": 1648572159174,
+      "expiresAt": 1651164155341
+    }
+  },
+  "rules": {},
+  "version": 1
+}
