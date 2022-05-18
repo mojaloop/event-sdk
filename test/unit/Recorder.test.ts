@@ -82,7 +82,11 @@ describe('Recorder', () => {
     }
     jest.mock('../../src/transport/EventLoggingServiceClient', () => {
       return jest.fn().mockImplementation(() => {
-        return { log: () => { }, grpcClient: () => { } };
+        return { log: () => {
+          // do nothing
+         }, grpcClient: () => {
+           //do nothing
+          } };
       })
     })
 
@@ -130,7 +134,11 @@ describe('Recorder', () => {
     }
     jest.mock('../../src/transport/EventLoggingServiceClient', () => {
       return jest.fn().mockImplementation(() => {
-        return { log: () => { }, grpcClient: () => { } };
+        return { log: () => {
+          // do nothing
+         }, grpcClient: () => { 
+           // do nothing
+         } };
       })
     })
 
@@ -142,7 +150,9 @@ describe('Recorder', () => {
     const recorder = new DefaultSidecarRecorderAsync(grpcClient)
 
     // Act
-    const result = await recorder.record(message, true, () => {})
+    const result = await recorder.record(message, true, () => {
+      // do nothing
+    })
 
     // Assert
     expect(grpcClient.grpcClient.log).toHaveBeenCalled();
@@ -178,7 +188,11 @@ describe('Recorder', () => {
     }
     jest.mock('../../src/transport/EventLoggingServiceClient', () => {
       return jest.fn().mockImplementation(() => {
-        return { log: () => { }, grpcClient: () => { } };
+        return { log: () => { 
+          // do nothing
+        }, grpcClient: () => { 
+          // do nothing
+        } };
       })
     })
 

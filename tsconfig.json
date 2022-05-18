@@ -8,7 +8,9 @@
     "**/*.test.ts",
     "test",
     "lib",
-    "coverage"
+    "coverage",
+    "config",
+    "**/*.json"
   ],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */

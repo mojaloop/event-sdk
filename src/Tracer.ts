@@ -3,7 +3,6 @@ import { TraceTags, EventTraceMetadata, EventMessage, TypeSpanContext, HttpReque
 import { Span, ContextOptions, Recorders, setHttpHeader } from "./Span"
 import Util from './lib/util'
 import Config from "./lib/config";
-import { setMaxListeners } from "cluster";
 
 const _ = require('lodash');
 

@@ -33,9 +33,9 @@ class EventLoggingServiceClient {
   grpcClient : any;
 
   constructor(host: string, port: number) {
-    let eventLoggerService = loadEventLoggerService();
+    const eventLoggerService = loadEventLoggerService();
 
-    let client = new eventLoggerService(`${host}:${port}`, grpc.credentials.createInsecure())
+    const client = new eventLoggerService(`${host}:${port}`, grpc.credentials.createInsecure())
     this.grpcClient = client
   }
   
@@ -44,7 +44,7 @@ class EventLoggingServiceClient {
    */
   log = async (event: EventMessage): Promise<LogResponse> => {
     return new Promise((resolve, reject) => {
-      let wireEvent: any = Object.assign({}, event);
+      const wireEvent: any = Object.assign({}, event);
       if (!event.content) {
         throw new Error('Invalid eventMessage: content is mandatory');
       }
@@ -52,7 +52,7 @@ class EventLoggingServiceClient {
       try {
         wireEvent.content = toAny(event.content, event.type);
 
-        let wireEventCopy: any = JSON.parse(JSON.stringify(wireEvent));
+        const wireEventCopy: any = JSON.parse(JSON.stringify(wireEvent));
         wireEventCopy.content.value = `Buffer(${wireEventCopy.content.value.data.length})`
         Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
         this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {

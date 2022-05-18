@@ -17,7 +17,7 @@ const customFormat = printf(({ level, message, timestamp }: formatInput) => {
   return `${timestamp} - ${level}: ${message}`
 })
 
-let transport = new transports.Console()
+const transport = new transports.Console()
 
 const Logger = createLogger({
   level: 'silly',
