@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.2](https://github.com/mojaloop/event-sdk/compare/v11.0.1...v11.0.2) (2022-05-19)
+
+
+### Bug Fixes
+
+* moved logger dependency as a peerDependency to be consistent with other mojaloop repos ([f57c3b3](https://github.com/mojaloop/event-sdk/commit/f57c3b3d93f71ada014cb048a4f269a54827da1e))
+
 ### [11.0.1](https://github.com/mojaloop/event-sdk/compare/v11.0.0...v11.0.1) (2022-05-19)
 
 
