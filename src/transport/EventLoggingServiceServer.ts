@@ -26,7 +26,7 @@ import { EventMessage, LogResponse, LogResponseStatus } from "../model/EventMess
 import { fromAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
-import events = require('events');
+import events from 'events'
 
 const grpc = require('grpc')
 const Logger = require('@mojaloop/central-services-logger')

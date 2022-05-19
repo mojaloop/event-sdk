@@ -1,8 +1,5 @@
-import { serializeError } from 'serialize-error';
-// const {serializeError} = require('serialize-error');
-// const {serializeError} = await import('/modules/my-module.js')
-
 import _ from 'lodash'
+import { serializeError } from 'serialize-error'
 import TraceParent from 'traceparent'
 
 import {

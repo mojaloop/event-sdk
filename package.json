@@ -2,6 +2,26 @@
   "name": "@mojaloop/event-sdk",
   "version": "10.7.2",
   "description": "Shared code for Event Logging",
+  "keywords": [
+    "event"
+  ],
+  "author": "ModusBox",
+  "contributors": [
+    "Georgi Georgiev <georgi.georgiev@modusbox.com>",
+    "Miguel de Barros <miguel.debarros@modusbox.com>",
+    "Ramiro González Maciel <ramiro@modusbox.com>",
+    "Valentin Genev <valentin.genev@modusbox.com>",
+    "Lewis Daly <lewisd@crosslaketech.com"
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/mojaloop/event-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/mojaloop/event-sdk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mojaloop/event-sdk.git"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -9,22 +29,24 @@
     "/dist",
     "/protos"
   ],
+  "engines": {
+    "node": "=16.x"
+  },
   "scripts": {
     "ts_app": "npx tsc ; npx ts-node src/examples/ts_app.ts",
     "js_app": "npx tsc ; npx ts-node src/examples/js_app.js",
     "server": "npx tsc ; npx ts-node src/server/server.ts",
     "test": "npm run test:unit",
     "pretest": "npm run build",
+    "prepublishOnly": "npm run build",
     "lint": "npx eslint ./src/**/*.ts ./test/**/*.ts",
     "lint:fix": "npm run lint -- --fix",
     "build": "npx tsc",
     "watch": "npx tsc -w",
-    "test:unit1": "npx jest --testMatch '**/test/unit/**/*.test.ts'",
-    "test:unit2": "NODE_OPTIONS=--experimental-vm-modules npx jest",
-    "test:unit": "npx jest",
-    "test:junit": "npx jest --reporters=default --reporters=jest-junit --testMatch '**/test/unit/**/*.test.ts'",
-    "test:coverage": "npx jest --coverage --coverageThreshold='{}' --testMatch '**/test/unit/**/*.test.ts'",
-    "test:coverage-check": "npx jest --coverage --testMatch '**/test/unit/**/*.test.ts'",
+    "test:unit": "npx jest --reporters=default",
+    "test:xunit": "JEST_JUNIT_OUTPUT_DIR=./test/reports/ JEST_JUNIT_OUTPUT_NAME=xunit.xml npm run test:unit -- --reporters=jest-junit",
+    "test:coverage": "npm run test:unit -- --coverage --coverageThreshold='{}'",
+    "test:coverage-check": "npm run test:unit -- --coverage",
     "warn-pre-commit": "echo \"pre commit tasks running. build and test\"",
     "audit:resolve": "SHELL=sh resolve-audit --production",
     "audit:check": "SHELL=sh check-audit --production",
@@ -40,26 +62,6 @@
     "lint",
     "test:unit"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mojaloop/event-sdk.git"
-  },
-  "keywords": [
-    "event"
-  ],
-  "author": "ModusBox",
-  "contributors": [
-    "Georgi Georgiev <georgi.georgiev@modusbox.com>",
-    "Miguel de Barros <miguel.debarros@modusbox.com>",
-    "Ramiro González Maciel <ramiro@modusbox.com>",
-    "Valentin Genev <valentin.genev@modusbox.com>",
-    "Lewis Daly <lewisd@crosslaketech.com"
-  ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/mojaloop/event-sdk/issues"
-  },
-  "homepage": "https://github.com/mojaloop/event-sdk#readme",
   "dependencies": {
     "@grpc/proto-loader": "0.6.12",
     "@mojaloop/central-services-logger": "11.0.0",
@@ -71,7 +73,7 @@
     "parse-strings-in-object": "2.0.0",
     "protobufjs": "6.11.2",
     "rc": "1.2.8",
-    "serialize-error": "11.0.0",
+    "serialize-error": "8.1.0",
     "traceparent": "1.0.0",
     "tslib": "2.4.0",
     "uuid4": "2.0.2",
@@ -101,32 +103,11 @@
     "proxyquire": "2.1.3",
     "replace": "^1.2.1",
     "sinon": "14.0.0",
-    "standard": "17.0.0",
     "ts-jest": "28.0.2",
     "ts-node": "10.7.0",
     "tslint": "6.1.3",
     "typedoc": "0.22.15",
     "typescript": "4.6.4"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts"
-    ],
-    "exclude": [
-      "typings"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
-  },
-  "standard": {
-    "ignore": [
-      "/dist",
-      "jest.config.js"
-    ]
   },
   "standard-version": {
     "scripts": {

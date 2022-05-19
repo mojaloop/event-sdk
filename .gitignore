@@ -80,5 +80,5 @@ private
 # Ignore test results
 **/test/results/*
 
-# General ignore
+# Ignore general
 **/*.IGNORE.*

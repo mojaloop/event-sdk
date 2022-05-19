@@ -1,8 +1,15 @@
 module.exports = {
   displayName: 'tsc',
+  testMatch: [
+    '**/test/unit/**/*.test.ts'
+  ],
   transform: {
-    ".(ts)": "ts-jest"
+    '^.+\\.ts$': 'ts-jest',
   },
+  transformIgnorePatterns: [
+    '^.+\\.json$',
+    'jest.config.js'
+  ],
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   verbose: true,
   coverageThreshold: {
