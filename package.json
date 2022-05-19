@@ -33,6 +33,12 @@
   "engines": {
     "node": "=16.x"
   },
+  "pre-commit": [
+    "warn-pre-commit",
+    "dep:check",
+    "lint",
+    "test"
+  ],
   "scripts": {
     "ts_app": "npx tsc ; npx ts-node src/examples/ts_app.ts",
     "js_app": "npx tsc ; npx ts-node src/examples/js_app.js",
@@ -56,12 +62,6 @@
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
-  "pre-commit": [
-    "warn-pre-commit",
-    "dep:check",
-    "lint",
-    "test"
-  ],
   "dependencies": {
     "@grpc/proto-loader": "0.6.12",
     "@mojaloop/central-services-logger": "11.0.0",
