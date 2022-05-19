@@ -26,7 +26,7 @@ import { EventMessage, LogResponse, LogResponseStatus } from "../model/EventMess
 import { fromAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
-import events = require('events');
+import events from 'events'
 
 const grpc = require('grpc')
 const Logger = require('@mojaloop/central-services-logger')
@@ -42,9 +42,9 @@ class EventLoggingServiceServer extends events.EventEmitter {
 
   constructor(host : string, port: number ) {
     super();
-    let eventLoggerService = loadEventLoggerService();
+    const eventLoggerService = loadEventLoggerService();
 
-    var server = new grpc.Server()
+    const server = new grpc.Server()
     server.addService(eventLoggerService.service, {
       log: this.logEventReceivedHandler.bind(this)
     })
@@ -61,7 +61,7 @@ class EventLoggingServiceServer extends events.EventEmitter {
   }
 
   logEventReceivedHandler (call: any, callback: any) {
-    let event = call.request
+    const event = call.request
     // We're on plain JavaScript, so although this *should* be a EventMessage since gRPC is typed, let's be sure
     if (!event.id) {
       return callback(new Error(`Couldn't parse message parameter. It doesn't have an id property. parameter: ${event}`))

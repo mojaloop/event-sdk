@@ -236,7 +236,7 @@ class EventTraceMetadata implements TypeSpanContext {
   tracestates: { [key: string]: TraceTags | string }
 
   constructor(spanContext: Partial<TypeSpanContext>) {
-    let {
+    const {
       service = '',
       traceId = newTraceId(),
       spanId = newSpanId(),
@@ -357,7 +357,7 @@ class EventMetadata implements TypeEventMetadata {
    * @param eventMetadata 
    */
   static log(eventMetadata: TypeEventMetadata): TypeEventMetadata {
-    let typeAction = new LogEventTypeAction({ action: eventMetadata.action });
+    const typeAction = new LogEventTypeAction({ action: eventMetadata.action });
     return new EventMetadata(Object.assign(eventMetadata, typeAction));
   }
   /**
@@ -365,7 +365,7 @@ class EventMetadata implements TypeEventMetadata {
    * @param eventMetadata 
    */
   static trace(eventMetadata: TypeEventMetadata): TypeEventMetadata {
-    let typeAction = new TraceEventTypeAction({ action: eventMetadata.action });
+    const typeAction = new TraceEventTypeAction({ action: eventMetadata.action });
     return new EventMetadata(Object.assign(eventMetadata, typeAction));
   }
 
@@ -374,8 +374,8 @@ class EventMetadata implements TypeEventMetadata {
    * @param eventMetadata 
    */  
   static audit(eventMetadata: TypeEventMetadata): TypeEventMetadata {
-    let typeAction = new AuditEventTypeAction({ action: eventMetadata.action });
-    let a = (Object.assign(eventMetadata, typeAction))
+    const typeAction = new AuditEventTypeAction({ action: eventMetadata.action });
+    const a = (Object.assign(eventMetadata, typeAction))
     return new EventMetadata(a);
   }
 
@@ -384,7 +384,7 @@ class EventMetadata implements TypeEventMetadata {
    * @param eventMetadata 
    */
   constructor(eventMetadata: TypeEventMetadata) {
-    let { createdAt = new Date().toISOString(), state, ...restParams } = eventMetadata
+    const { createdAt = new Date().toISOString(), state, ...restParams } = eventMetadata
     if (createdAt instanceof Date) {
       this.createdAt = createdAt.toISOString() // ISO 8601
     } else {
@@ -491,7 +491,7 @@ const logFilterMap = ((): Map<string, Array<TypeEventTypeAction['action']>> => {
   }
 
   Config.EVENT_LOGGER_LOG_FILTER.split(',').forEach(filter => {
-    let [key, value] = filter.trim().split(':')
+    const [key, value] = filter.trim().split(':')
     if (key === '*') {
       return filterMap = new Map(Object.entries(actionDictionary))
     }
@@ -502,7 +502,7 @@ const logFilterMap = ((): Map<string, Array<TypeEventTypeAction['action']>> => {
       if (valueToAdd.length === actionDictionary[key].length) {
         filterMap.set(key, valueToAdd)
       } else {
-        let valueToUpdate = filterMap.get(key)
+        const valueToUpdate = filterMap.get(key)
         if (!valueToUpdate.includes(valueToAdd[0])) {
           valueToUpdate.push(valueToAdd[0])
           filterMap.set(key, valueToUpdate)

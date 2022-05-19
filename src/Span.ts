@@ -1,8 +1,6 @@
-const {serializeError} = require('serialize-error');
-
-
 import _ from 'lodash'
-const TraceParent = require('traceparent')
+import { serializeError } from 'serialize-error'
+import TraceParent from 'traceparent'
 
 import {
   NullEventAction,

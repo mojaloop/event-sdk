@@ -39,7 +39,7 @@ import { EventType, TypeEventTypeAction, logFilterMap, TraceTags } from "../mode
  * 
  * @returns overrideDict
  */
-function eventAsyncOverrides(asyncOverridesString: string = ''): { [index: string]: boolean } {
+function eventAsyncOverrides(asyncOverridesString = ''): { [index: string]: boolean } {
   const overrideDict: { [index: string]: boolean } = {}
   asyncOverridesString.split(',').map(val => overrideDict[val] = true)
 
@@ -66,7 +66,7 @@ function shouldOverrideEvent(overrideDict: { [index: string]: boolean }, eventTy
 }
 
 const getTracestateMap = (vendor: string, tracestate: string): { [key: string]: any } => {
-  let ownTraceState = tracestate
+  const ownTraceState = tracestate
     .split(',')
     .filter(ts => ts.split('=')[0] === vendor)[0] //get own vendor
 

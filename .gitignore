@@ -76,3 +76,9 @@ docs/
 .idea/**
 **/*.iml
 private
+
+# Ignore test results
+**/test/results/*
+
+# Ignore general
+**/*.IGNORE.*
