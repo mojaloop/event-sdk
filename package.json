@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/event-sdk",
-  "version": "10.7.2",
+  "version": "11.0.0",
   "description": "Shared code for Event Logging",
   "keywords": [
     "event",
