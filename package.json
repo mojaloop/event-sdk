@@ -3,7 +3,8 @@
   "version": "10.7.2",
   "description": "Shared code for Event Logging",
   "keywords": [
-    "event"
+    "event",
+    "mojaloop"
   ],
   "author": "ModusBox",
   "contributors": [
@@ -58,9 +59,8 @@
   "pre-commit": [
     "warn-pre-commit",
     "dep:check",
-    "build",
     "lint",
-    "test:unit"
+    "test"
   ],
   "dependencies": {
     "@grpc/proto-loader": "0.6.12",
