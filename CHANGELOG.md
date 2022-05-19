@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [11.0.1](https://github.com/mojaloop/event-sdk/compare/v11.0.0...v11.0.1) (2022-05-19)
+
+
+### Bug Fixes
+
+* postchangelog now will correctly work ([0fab3e9](https://github.com/mojaloop/event-sdk/commit/0fab3e97e2c6d2894b2f8992cc750afe4777d840))
+
 ## [11.0.0](https://github.com/mojaloop/event-sdk/compare/v10.7.2...v11.0.0) (2022-05-19)
 
 
