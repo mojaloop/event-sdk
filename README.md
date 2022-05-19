@@ -2,7 +2,6 @@
 
 **EXPERIMENTAL** Event SDK for Clients &amp; Server implementations
 
-
 [![Git Commit](https://img.shields.io/github/last-commit/mojaloop/event-sdk.svg?style=flat)](https://github.com/mojaloop/event-sdk/commits/master)
 [![Git Releases](https://img.shields.io/github/release/mojaloop/event-sdk.svg?style=flat)](https://github.com/mojaloop/event-sdk/releases)
 [![Npm Version](https://img.shields.io/npm/v/@mojaloop/event-sdk.svg?style=flat)](https://www.npmjs.com/package/@mojaloop/event-sdk)
@@ -46,17 +45,19 @@ Edit the file in `./config/default.json` to configure the logger, or set the fol
 | `EVENT_SDK_TRACEID_PER_VENDOR` | If enabled, when vendor of the parent span is different from the vendor set by `EVENT_SDK_VENDOR_PREFIX` the traceId will be new and the parent traceId will be stored as a tag: `corelationTraceId` . Otherwise, the traceId is persisted. | `false` | `true`, `false` |
 
 ## Tracestate format and methods
+
 _Note: Tags in the tracestate are supported from version [v9.4.1](https://github.com/mojaloop/event-sdk/releases/tag/v9.4.1). Since [v9.5.2](https://github.com/mojaloop/event-sdk/releases/tag/v9.5.2) tracestate is base64 encoded string. To be able to use the tracestate correctly accross all services, they should have same version of event-sdk and [central-services-shared](https://github.com/mojaloop/central-services-shared) librarires._
 
 ### Format
+
 Tracestate header can be used to preserve vendor specific information across various connected systems in multivendor setup. The  format is according to the [w3c specifications](https://github.com/w3c/trace-context/blob/master/spec/20-http_header_format.md#tracestate-header).
 Tracestate header example value: `acmevendor=eyJzcGFuSWQiOiI2Njg2Nzk1MDBiMGUzYzQwIiwgInRyYW5zZmVyX3R4X21zOjE1OTA0MDc0NjUifQ==`, where the vendor is `acmevendor` and the value is base64 encoded key value pair as `spanId` key is set automatically. When decoded:  `{"spanId":"668679500b0e3c40", "transfer_tx_ms:1590407465"}`
 
 ### Methods to access the tracestate are:
+
 * setTracestateTags - sets user tags into the tracestate
 * getTracestates - Returns the tracestates object per vendor, as configured vendor tracestate is decoded key value pair with tags
 * getTracestateTags - Returns the tracestate tags for the configured vendor as key value pairs
-
 
 ## Current Supported Events
 
@@ -80,6 +81,24 @@ Tracestate header example value: `acmevendor=eyJzcGFuSWQiOiI2Njg2Nzk1MDBiMGUzYzQ
 Instrumented services should be part of a configuration which includes the [event sidecar](https://github.com/mojaloop/event-sidecar) and [event-streaming-processor](https://github.com/mojaloop/event-streaming-processor). Detailed architecture overview can be found [here](https://docs.mojaloop.io/documentation/mojaloop-technical-overview/event-framework/)
 
 Examples of usage of the SDK can be found in the `src/examples` directory of this repo: [Javascript example](src/examples/js_app.js) and [TypeScript example](src/examples/ts_app.ts).
+
+## Auditing Dependencies
+
+We use `npm-audit-resolver` along with `npm audit` to check dependencies for vulnerabilities, and keep track of resolved dependencies with an `audit-resolv.json` file.
+
+To start a new resolution process, run:
+
+```bash
+npm run audit:resolve
+```
+
+You can then check to see if the CI will pass based on the current dependencies with:
+
+```bash
+npm run audit:check
+```
+
+And commit the changed `audit-resolv.json` to ensure that CircleCI will build correctly.
 
 ## Automated Releases
 
