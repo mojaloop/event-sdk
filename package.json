@@ -70,7 +70,7 @@
     "lodash": "4.17.21",
     "moment": "2.29.3",
     "parse-strings-in-object": "2.0.0",
-    "protobufjs": "6.11.2",
+    "protobufjs": "6.11.3",
     "rc": "1.2.8",
     "serialize-error": "8.1.0",
     "traceparent": "1.0.0",
