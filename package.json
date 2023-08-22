@@ -23,9 +23,6 @@
     "event",
     "mojaloop"
   ],
-  "engines": {
-    "node": "=16.x"
-  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -87,6 +84,7 @@
     "@types/uuid": "8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
+    "audit-ci": "^6.6.1",
     "debug": "4.3.4",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
@@ -94,8 +92,7 @@
     "faucet": "0.0.1",
     "jest": "28.1.0",
     "jest-junit": "13.2.0",
-    "npm-audit-resolver": "3.0.0-7",
-    "npm-check-updates": "13.0.1",
+    "npm-check-updates": "16.12.3",
     "nyc": "15.1.0",
     "pre-commit": "1.2.2",
     "prettier": "^2.6.2",
