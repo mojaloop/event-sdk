@@ -37,8 +37,8 @@ const testRecorder: (delayMs: number) => Recorders = (delayMs: number) => ({
   defaultRecorder: {
     recorder: Function,
     preProcess: (event: EventMessage) => event,
-    record: async (_event: EventMessage) => {
-      return new Promise((resolve, _reject) => {
+    record: async (_: EventMessage) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve({
             status: LogResponseStatus.accepted,
