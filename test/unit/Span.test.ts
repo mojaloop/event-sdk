@@ -24,7 +24,7 @@
  --------------
  ******/
 
-import Sinon, { SinonSandbox } from 'sinon'
+import { SinonSandbox, createSandbox } from 'sinon'
 
 import Config from '../../src/lib/config'
 import { Recorders } from '../../src/Span'
@@ -37,10 +37,9 @@ const testRecorder: (delayMs: number) => Recorders = (delayMs: number) => ({
   defaultRecorder: {
     recorder: Function,
     preProcess: (event: EventMessage) => event,
-    record: async (event: EventMessage) => {
-      return new Promise((resolve, reject) => {
+    record: async (_event: EventMessage) => {
+      return new Promise((resolve, _reject) => {
         setTimeout(() => {
-
           resolve({
             status: LogResponseStatus.accepted,
           })
@@ -52,7 +51,7 @@ const testRecorder: (delayMs: number) => Recorders = (delayMs: number) => ({
 
 describe('Span', () => {
   beforeEach(() => {
-    sandbox = Sinon.createSandbox()
+    sandbox = createSandbox()
   })
 
   afterEach(() => {
