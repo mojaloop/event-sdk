@@ -28,7 +28,7 @@ import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 import events from 'events'
 
-const grpc = require('grpc')
+const grpc = require('@grpc/grpc-js')
 const Logger = require('@mojaloop/central-services-logger')
 
 const EVENT_RECEIVED = 'eventReceived';

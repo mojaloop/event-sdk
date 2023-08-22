@@ -27,7 +27,7 @@ import { toAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
-const grpc = require('grpc')
+const grpc = require('@grpc/grpc-js')
 
 class EventLoggingServiceClient {
   grpcClient : any;
