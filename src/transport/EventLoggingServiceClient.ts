@@ -27,7 +27,7 @@ import { toAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
-const grpc = require('grpc')
+const grpc = require('@grpc/grpc-js')
 
 class EventLoggingServiceClient {
   grpcClient : any;
@@ -52,18 +52,19 @@ class EventLoggingServiceClient {
       try {
         wireEvent.content = toAny(event.content, event.type);
 
-        const wireEventCopy: any = JSON.parse(JSON.stringify(wireEvent));
-        wireEventCopy.content.value = `Buffer(${wireEventCopy.content.value.data.length})`
-        Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+        if (Logger.isDebugEnabled) {
+          const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.data.length})`}} 
+          Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+        }
         this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
-          Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+          Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
           if (error) {
             reject(error); 
           }
           resolve(response);
         })
       } catch (e) {
-        Logger.error(e)
+        Logger.isErrorEnabled && Logger.error(e)
         reject(e)
       }
     })

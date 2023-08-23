@@ -24,7 +24,7 @@
  ******/
 
 const path = require('path');
-const grpc = require('grpc')
+const grpc = require('@grpc/grpc-js')
 const protoLoader = require('@grpc/proto-loader')
 
 const PROTO_PATH = path.join(__dirname,'../../protos/message_type.proto');

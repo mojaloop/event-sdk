@@ -23,10 +23,10 @@
  --------------
  ******/
 
-jest.mock('grpc')
+jest.mock('@grpc/grpc-js')
 jest.mock('../../../src/transport/EventLoggerServiceLoader')
 
-const grpc = require('grpc')
+const grpc = require('@grpc/grpc-js')
 
 import { EventLoggingServiceServer } from '../../../src/transport/EventLoggingServiceServer'
 import { loadEventLoggerService } from '../../../src/transport/EventLoggerServiceLoader'

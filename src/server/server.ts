@@ -31,6 +31,6 @@ const Logger = require('@mojaloop/central-services-logger')
 
 const server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
 server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
-  Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
+  Logger.isDebugEnabled && Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
 });
 server.start();

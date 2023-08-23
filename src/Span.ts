@@ -165,9 +165,9 @@ class Span implements Partial<ISpan> {
   defaultTagsSetter(message?: TypeOfMessage): Span {
     const w3cHeaders = getTracestate(this.spanContext)
     if (w3cHeaders) {
-      this.setTags(Object.assign(this.spanContext.tags, w3cHeaders))
+      this.spanContext.tags && this.setTags(Object.assign(this.spanContext.tags, w3cHeaders))
       if (!(Config.EVENT_LOGGER_VENDOR_PREFIX in this.getTracestates())) {
-        this.setTracestates(Object.assign(this.spanContext.tracestates, Util.getTracestateMap(Config.EVENT_LOGGER_VENDOR_PREFIX, w3cHeaders.tracestate).tracestates))
+        this.spanContext.tracestates && this.setTracestates(Object.assign(this.spanContext.tracestates, Util.getTracestateMap(Config.EVENT_LOGGER_VENDOR_PREFIX, w3cHeaders.tracestate).tracestates))
       }
     }
     return this

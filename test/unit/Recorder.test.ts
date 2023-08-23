@@ -27,7 +27,7 @@
  --------------
  ******/
 
-import { DefaultLoggerRecorder, DefaultSidecarRecorderAsync, DefaultSidecarRecorder } from "../../src/Recorder"
+import { DefaultLoggerRecorder, DefaultSidecarRecorderAsync } from "../../src/Recorder"
 import * as EventSdk from "../../src/index"
 import { EventLoggingServiceClient } from "../../src/transport/EventLoggingServiceClient";
 
