@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.1",
-    "@grpc/proto-loader": "0.7.8",
+    "@grpc/proto-loader": "0.7.9",
     "brototype": "0.0.6",
     "error-callsites": "2.0.4",
     "lodash": "4.17.21",
