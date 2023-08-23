@@ -54,7 +54,7 @@ class EventLoggingServiceClient {
 
         if (Logger.isDebugEnabled) {
           const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.data.length})`}} 
-          Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+          Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
         }
         this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
           Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
