@@ -57,7 +57,7 @@ class EventLoggingServiceServer extends events.EventEmitter {
   start() : any {
     this.server.bind(`${this.host}:${this.port}`, grpc.ServerCredentials.createInsecure())
     this.server.start()
-    Logger.info(`Server listening on ${this.host}:${this.port}...`)
+    Logger.isInfoEnabled && Logger.info(`Server listening on ${this.host}:${this.port}...`)
   }
 
   logEventReceivedHandler (call: any, callback: any) {
