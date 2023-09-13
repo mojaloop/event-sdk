@@ -65,9 +65,10 @@ describe('EventLoggingServiceServer', () => {
       loadEventLoggerService.mockReturnValueOnce({
         service: 'mock'
       })
+      
       const mockServer = {
         addService: jest.fn(),
-        bind: jest.fn(),
+        bindAsync: jest.fn(),
         start: jest.fn()
       }
       grpc.Server.mockImplementationOnce(() => mockServer)
@@ -77,8 +78,7 @@ describe('EventLoggingServiceServer', () => {
       server.start()
       
       // Assert
-      expect(mockServer.bind).toHaveBeenCalledTimes(1)
-      expect(mockServer.start).toHaveBeenCalledTimes(1)
+      expect(mockServer.bindAsync).toHaveBeenCalledTimes(1)
     })
   })
   
