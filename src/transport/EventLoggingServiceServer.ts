@@ -27,6 +27,7 @@ import { fromAny } from "./MessageMapper";
 import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 import events from 'events'
+import { Server as GRPCServer } from '@grpc/grpc-js';
 
 const grpc = require('@grpc/grpc-js')
 const Logger = require('@mojaloop/central-services-logger')
@@ -36,7 +37,7 @@ const EVENT_RECEIVED = 'eventReceived';
 
 class EventLoggingServiceServer extends events.EventEmitter {
 
-  private server: any;
+  private server: GRPCServer;
   private host : string;
   private port: number;
 
@@ -55,9 +56,17 @@ class EventLoggingServiceServer extends events.EventEmitter {
   }
 
   start() : any {
-    this.server.bind(`${this.host}:${this.port}`, grpc.ServerCredentials.createInsecure())
-    this.server.start()
-    Logger.isInfoEnabled && Logger.info(`Server listening on ${this.host}:${this.port}...`)
+    this.server.bindAsync(
+        `${this.host}:${this.port}`, 
+        grpc.ServerCredentials.createInsecure(),
+        (err: any, port: any) => {
+            if (err) {
+                throw err
+            }
+            this.server.start()
+            Logger.isInfoEnabled && Logger.info(`Server listening on ${this.host}:${port}...`)
+        }
+    )
   }
 
   logEventReceivedHandler (call: any, callback: any) {
