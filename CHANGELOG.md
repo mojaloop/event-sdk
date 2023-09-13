@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [13.0.0](https://github.com/mojaloop/event-sdk/compare/v12.0.2...v13.0.0) (2023-09-13)
+
+
+### Bug Fixes
+
+* fix grpc integration ([#77](https://github.com/mojaloop/event-sdk/issues/77)) ([393f57f](https://github.com/mojaloop/event-sdk/commit/393f57fb7db8df896d075c8adf5683f5d8d3d7e8))
+
 ### [12.0.2](https://github.com/mojaloop/event-sdk/compare/v12.0.1...v12.0.2) (2023-08-29)
 
 ### [12.0.1](https://github.com/mojaloop/event-sdk/compare/v12.0.0...v12.0.1) (2023-08-23)
