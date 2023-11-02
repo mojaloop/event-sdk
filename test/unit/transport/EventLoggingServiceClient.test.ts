@@ -28,6 +28,7 @@ const Uuid = require('uuid4')
 
 import { EventLoggingServiceClient } from '../../../src/transport/EventLoggingServiceClient'
 import { EventMessage, LogResponse, LogResponseStatus } from '../../../src/model/EventMessage'
+const Logger = require('@mojaloop/central-services-logger')
 
 
 let client: EventLoggingServiceClient
@@ -42,7 +43,7 @@ describe('EventLoggingServiceClient', () => {
     // Arrange
     const invalidEvent: EventMessage = <EventMessage>{
       type: 'application/json',
-      id: <String>Uuid()
+      id: <string>Uuid()
     }
     
     // Act
@@ -56,7 +57,7 @@ describe('EventLoggingServiceClient', () => {
     // Arrange
     const event: EventMessage = <EventMessage>{
       type: 'invalid',
-      id: <String>Uuid(),
+      id: <string>Uuid(),
       content: `{"hello":true}`
     }
     
@@ -71,7 +72,7 @@ describe('EventLoggingServiceClient', () => {
     // Arrange
     const event: EventMessage = <EventMessage>{
       type: 'application/json',
-      id: <String>Uuid(),
+      id: <string>Uuid(),
       content: `{"hello":true}`
     }
     client.grpcClient = {
@@ -92,7 +93,7 @@ describe('EventLoggingServiceClient', () => {
     // Arrange
     const event: EventMessage = <EventMessage>{
       type: 'text/plain',
-      id: <String>Uuid(),
+      id: <string>Uuid(),
       content: Buffer.from(`{"hello":true}`)
     }
     client.grpcClient = {
@@ -109,11 +110,33 @@ describe('EventLoggingServiceClient', () => {
     expect(result).toStrictEqual(new LogResponse(LogResponseStatus.accepted))
   })
 
+  it('processes the event with buffer input correctly if log level is `debug`', async () => {
+    // Arrange
+    const event: EventMessage = <EventMessage>{
+      type: 'text/plain',
+      id: <string>Uuid(),
+      content: Buffer.from(`{"hello":true}`)
+    }
+    client.grpcClient = {
+      log: jest.fn().mockImplementationOnce((event, cbFunc) => {
+        const response = new LogResponse(LogResponseStatus.accepted)
+        cbFunc(null, response)
+      })
+    }
+    Logger.isDebugEnabled = true
+    
+    // Act
+    const result = await client.log(event)
+    
+    // Assert
+    expect(result).toStrictEqual(new LogResponse(LogResponseStatus.accepted))
+  })
+
   it('processes the event with an error callback', async () => {
     // Arrange
     const event: EventMessage = <EventMessage>{
       type: 'application/json',
-      id: <String>Uuid(),
+      id: <string>Uuid(),
       content: `{"hello":true}`
     }
     client.grpcClient = {
