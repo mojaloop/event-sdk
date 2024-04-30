@@ -46,13 +46,13 @@ const expectStringifyToMatch = (result: any, expected: any) => {
 
 const Config = jest.requireActual('../../src/lib/config')
 const mockConfig = Config.default
-jest.mock('../../src/lib/config', () => mockConfig)
 
 describe('Tracer', () => {
+  jest.mock('../../src/lib/config', () => mockConfig)
   const DefaultSidecarRecorder = jest.requireActual('../../src/Recorder').DefaultSidecarRecorder
   const { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
   const Tracer = jest.requireActual('../../src/Tracer').Tracer
-  
+
   const messageProtocol = {
     id: "xyz1234",
     to: "DFSP1",
@@ -86,10 +86,10 @@ describe('Tracer', () => {
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const spanContext = tracer.getContext()
-      
+
       // Act
       const childB = Tracer.createChildSpanFromContext('service2', spanContext)
-      
+
       // Assert
       const tags = childB.getContext().tags!
       expect(tags['tracestate']).not.toBeDefined()
@@ -104,10 +104,10 @@ describe('Tracer', () => {
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
       const spanContext = tracer.getContext()
-      
+
       // Act
       const childB = Tracer.createChildSpanFromContext('service2', spanContext)
-      
+
       // Assert
       const tags = childB.getContext().tags!
       expect(tags['tracestate']).toBeDefined()
@@ -134,7 +134,7 @@ describe('Tracer', () => {
 
       // Act
       const result = Tracer.extractContextFromMessage(carrier)
-      
+
       // Assert
       expect(result).toEqual(carrier.trace)
     })
@@ -157,7 +157,7 @@ describe('Tracer', () => {
 
       // Act
       const result = Tracer.extractContextFromMessage(carrier)
-      
+
       // Assert
       expect(result).not.toEqual(carrier.notTrace)
     })
@@ -179,7 +179,7 @@ describe('Tracer', () => {
       // Act
       delete request.headers.tracestate
       const result = Tracer.extractContextFromHttpRequest(request)!
-      
+
       // Assert
       const tracestateTag = result.tags!.tracestate
       expect(tracestateTag).not.toBeDefined()
@@ -196,7 +196,7 @@ describe('Tracer', () => {
       // Act
       delete request.headers.tracestate
       const result = Tracer.extractContextFromHttpRequest(request)!
-      
+
       // Assert
       const tracestateTag = result.tags!.tracestate
       expect(tracestateTag).not.toBeDefined()
@@ -210,7 +210,7 @@ describe('Tracer', () => {
 
       // Act
       const result = Tracer.extractContextFromHttpRequest(request, HttpRequestOptions.xb3)!
-      
+
       // Assert
       expect(result).not.toBeDefined()
     })
@@ -224,7 +224,7 @@ describe('Tracer', () => {
       // Act
       delete request.headers.traceparent
       const result = Tracer.extractContextFromHttpRequest(request, HttpRequestOptions.w3c)!
-      
+
       // Assert
       expect(result).not.toBeDefined()
     })
@@ -254,7 +254,7 @@ describe('Tracer', () => {
           cb(null, new LogResponse(LogResponseStatus.accepted))
         )
       }
-      
+
       // Act
       await tracer.info({ content: { messageProtocol } })
       await tracer.debug({ content: { messageProtocol } })
@@ -269,7 +269,7 @@ describe('Tracer', () => {
       await tracer.error(new Error('error'))
       await tracer.warning({ content: { messageProtocol } })
       await tracer.performance({ content: { messageProtocol } })
-      
+
       // Assert
       expect(tracer.spanContext.service).toBe('span')
     })
@@ -278,7 +278,7 @@ describe('Tracer', () => {
       // Arrange
       const tracer = Tracer.createSpan('service1')
       tracer.setTags({ tag: 'value' })
-      
+
       // Act
       const child = tracer.getChild('service2')
 
@@ -318,7 +318,7 @@ describe('Tracer', () => {
       expect(IIIChild.spanContext.service).toBe('service4')
 
       const newMessageC = IIIChild.injectContextToMessage({ trace: {} })
-      const expected1 = { trace: IIIChild.getContext() }  
+      const expected1 = { trace: IIIChild.getContext() }
       expectStringifyToMatch(newMessageC, expected1)
 
       const newMeta = await IIIChild.injectContextToMessage(new EventTraceMetadata({ service: '1' }))
@@ -370,7 +370,7 @@ describe('Tracer', () => {
           tracestate: 'af=spanId:b7ad6b7169203331' // ,acmevendor=eyJzcGFuSWQiOiIyMDNmODljMjM3NDhjZmIxIiwidGltZUFwaVByZXBhcmUiOiIyMjgzMjMyIiwidGltZUFwaUZ1bGZpbCI6IjI4MjMyMjMyIn0'
         }
       }
-      
+
       const newContext0 = Tracer.extractContextFromHttpRequest(request)
       const zeroChild = Tracer.createChildSpanFromContext('child III service', newContext0) //, { defaultRecorder: new DefaultLoggerRecorder() })
 
@@ -379,7 +379,7 @@ describe('Tracer', () => {
       header = await IIChild.injectContextToHttpRequest({ headers: { tracestate: 'm=dadfafa,j=123,mojaloop=dfasdfads' } }, HttpRequestOptions.xb3)
       const newContextB = Tracer.extractContextFromHttpRequest(header, HttpRequestOptions.xb3)
       expect(newContextB).not.toBeUndefined()
-      
+
       header = await Tracer.injectContextToHttpRequest(IIIChild.getContext(), { headers: {tracestate: 'mojaloop=12312312', traceparent: '00-1234567890123456-12345678-01'} })
       const newContextC = Tracer.extractContextFromHttpRequest(header)
       expect(newContextC).not.toBeUndefined()
@@ -388,7 +388,7 @@ describe('Tracer', () => {
       await tracer.finish('message', undefined, finishtime)
       const a = async () => await IIChild.finish()
       await expect(a()).not.toBeFalsy()
-      
+
       // Throws when new trying to finish already finished trace
       let action = async () => await tracer.finish()
       await expect(action()).rejects.toThrowError('span already finished')
