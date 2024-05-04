@@ -1,7 +1,12 @@
 const RC = require('parse-strings-in-object')(require('rc')('EVENT_SDK', require('../../config/default.json')))
 
+type LoggerType = 'sidecar' | 'kafka' | 'console' | 'null'
+
 type ConfigType = {
   ASYNC_OVERRIDE_EVENTS: string,
+  EVENT_LOGGER_TRACE: LoggerType,
+  EVENT_LOGGER_AUDIT: LoggerType,
+  EVENT_LOGGER_LOG: LoggerType,
   EVENT_LOGGER_SERVER_HOST: string,
   EVENT_LOGGER_SERVER_PORT: number,
   EVENT_LOGGER_KAFKA: string | object,
@@ -15,6 +20,9 @@ type ConfigType = {
 
 const Config: ConfigType = {
   ASYNC_OVERRIDE_EVENTS: RC.ASYNC_OVERRIDE_EVENTS,
+  EVENT_LOGGER_TRACE: RC.TRACE,
+  EVENT_LOGGER_AUDIT: RC.AUDIT,
+  EVENT_LOGGER_LOG: RC.LOG,
   EVENT_LOGGER_SERVER_HOST: RC.SERVER_HOST,
   EVENT_LOGGER_SERVER_PORT: RC.SERVER_PORT,
   EVENT_LOGGER_KAFKA: RC.KAFKA,

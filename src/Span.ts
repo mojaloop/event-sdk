@@ -37,6 +37,38 @@ const defaultRecorder = Config.EVENT_LOGGER_SIDECAR_DISABLED
   ? new DefaultLoggerRecorder()
   : new DefaultSidecarRecorder(new EventLoggingServiceClient(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT, Config.EVENT_LOGGER_KAFKA))
 
+const nullRecorder: IEventRecorder = {
+  recorder: () => null,
+  preProcess: (event: EventMessage) => event,
+  record: async () => ({ status: LogResponseStatus.accepted })
+}
+
+let consoleRecorder: IEventRecorder | false = Config.EVENT_LOGGER_SIDECAR_DISABLED && defaultRecorder
+let kafkaRecorder: IEventRecorder | false = !Config.EVENT_LOGGER_SIDECAR_DISABLED && !!Config.EVENT_LOGGER_KAFKA && defaultRecorder
+let sidecarRecorder: IEventRecorder | false = !Config.EVENT_LOGGER_SIDECAR_DISABLED && !Config.EVENT_LOGGER_KAFKA && defaultRecorder
+
+const eventRecorder = (eventType: 'EVENT_LOGGER_AUDIT' | 'EVENT_LOGGER_LOG' | 'EVENT_LOGGER_TRACE'): IEventRecorder => {
+  switch (Config[eventType]) {
+    case 'sidecar':
+      sidecarRecorder ||= new DefaultSidecarRecorder(new EventLoggingServiceClient(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT))
+      return sidecarRecorder
+    case 'kafka':
+      kafkaRecorder ||= new DefaultSidecarRecorder(new EventLoggingServiceClient(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT, Config.EVENT_LOGGER_KAFKA))
+      return kafkaRecorder
+    case 'console':
+      consoleRecorder ||= new DefaultLoggerRecorder()
+      return consoleRecorder
+    case 'null':
+      return nullRecorder
+  }
+}
+
+const defaultRecorders: Recorders = {
+  defaultRecorder,
+  logRecorder: eventRecorder('EVENT_LOGGER_LOG'),
+  auditRecorder: eventRecorder('EVENT_LOGGER_AUDIT'),
+  traceRecorder: eventRecorder('EVENT_LOGGER_TRACE')
+}
 
 /**
  * A dict containing EventTypes which should be treated asynchronously
@@ -144,7 +176,7 @@ class Span implements Partial<ISpan> {
     recorders?: Recorders,
     defaultTagsSetter?: (message: TypeOfMessage) => any) {
     this.defaultTagsSetter = defaultTagsSetter ? defaultTagsSetter : this.defaultTagsSetter
-    this.recorders = recorders ? recorders : { defaultRecorder }
+    this.recorders = recorders || defaultRecorders
     if (!!spanContext.tags && !!spanContext.tags.tracestate) {
       spanContext.tracestates = Util.getTracestateMap(Config.EVENT_LOGGER_VENDOR_PREFIX, spanContext.tags.tracestate).tracestates
       if (!spanContext.tracestates[Config.EVENT_LOGGER_VENDOR_PREFIX]) {
