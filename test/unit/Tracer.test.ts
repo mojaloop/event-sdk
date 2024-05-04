@@ -49,6 +49,7 @@ const mockConfig = Config.default
 
 describe('Tracer', () => {
   jest.mock('../../src/lib/config', () => mockConfig)
+  jest.mock('@mojaloop/central-services-stream', () => ({ Util: {Producer: {produceMessage(message: EventMessage) {}}}}));
   const DefaultSidecarRecorder = jest.requireActual('../../src/Recorder').DefaultSidecarRecorder
   const { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
   const Tracer = jest.requireActual('../../src/Tracer').Tracer
@@ -241,19 +242,15 @@ describe('Tracer', () => {
     })
 
     it('should create a parent span', async () => {
+      jest.mock('fs', () => ({ readFileSync: () => JSON.stringify({KAFKA: {PRODUCER: {EVENT: {POST: {config: {}}}}}})}));
       // Arrange
       const configWithSidecar = {
         EVENT_LOGGER_SIDECAR_DISABLED: false,
         EVENT_LOGGER_SERVER_HOST: 'localhost',
         EVENT_LOGGER_SERVER_PORT: 50051
       }
-      const eventClient = new EventLoggingServiceClient(configWithSidecar.EVENT_LOGGER_SERVER_HOST, configWithSidecar.EVENT_LOGGER_SERVER_PORT)
+      const eventClient = new EventLoggingServiceClient(configWithSidecar.EVENT_LOGGER_SERVER_HOST, configWithSidecar.EVENT_LOGGER_SERVER_PORT, 'config')
       const tracer = Tracer.createSpan('span', {}, { defaultRecorder: new DefaultSidecarRecorder(eventClient), logRecorder: new DefaultSidecarRecorder(eventClient) })
-      eventClient.grpcClient = {
-        log: jest.fn().mockImplementation((wireEvent: any, cb: any) =>
-          cb(null, new LogResponse(LogResponseStatus.accepted))
-        )
-      }
 
       // Act
       await tracer.info({ content: { messageProtocol } })
