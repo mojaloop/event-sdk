@@ -58,7 +58,7 @@ const eventRecorder = (eventType: 'EVENT_LOGGER_AUDIT' | 'EVENT_LOGGER_LOG' | 'E
     case 'console':
       consoleRecorder ||= new DefaultLoggerRecorder()
       return consoleRecorder
-    case 'null':
+    case 'off':
       return nullRecorder
   }
 }
