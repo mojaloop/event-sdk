@@ -9,7 +9,7 @@ type ConfigType = {
   EVENT_LOGGER_LOG: LoggerType,
   EVENT_LOGGER_SERVER_HOST: string,
   EVENT_LOGGER_SERVER_PORT: number,
-  EVENT_LOGGER_KAFKA: string | object,
+  EVENT_LOGGER_KAFKA: string | { PRODUCER: { EVENT: Record<string, {config: unknown}> }, TOPIC_TEMPLATES: {GENERAL_TOPIC_TEMPLATE: {TEMPLATE: string}}},
   EVENT_LOGGER_SIDECAR_DISABLED: boolean,
   EVENT_LOGGER_VENDOR_PREFIX: string,
   EVENT_LOGGER_TRACESTATE_HEADER_ENABLED: boolean,

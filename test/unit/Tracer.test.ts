@@ -66,7 +66,7 @@ describe('Tracer', () => {
     metadata: {
       event: {
         id: Uuid(),
-        type: 'prepare',
+        type: 'audit',
         action: 'prepare',
         createdAt: new Date(),
         state: {
@@ -242,7 +242,7 @@ describe('Tracer', () => {
     })
 
     it('should create a parent span', async () => {
-      jest.mock('fs', () => ({ readFileSync: () => JSON.stringify({KAFKA: {PRODUCER: {EVENT: {POST: {config: {}}}}}})}));
+      jest.mock('fs', () => ({ readFileSync: () => JSON.stringify({KAFKA: {PRODUCER: {EVENT: {AUDIT: {config: {}}, LOG: {config: {}}}}}})}));
       // Arrange
       const configWithSidecar = {
         EVENT_LOGGER_SIDECAR_DISABLED: false,

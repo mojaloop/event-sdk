@@ -31,17 +31,16 @@ class EventLoggingServiceClient {
   grpcClient : any;
   toAny: boolean;
 
-  constructor(host: string, port: number, kafkaConfig?: string | object) {
-    if (kafkaConfig) {
-      if (typeof kafkaConfig === 'string') {
-        kafkaConfig = JSON.parse(require('fs').readFileSync(kafkaConfig)).KAFKA?.PRODUCER?.EVENT?.POST?.config
-      }
+  constructor(host: string, port: number, kafkaConfig?: string | { PRODUCER: { EVENT: Record<string, {config: unknown}> }, TOPIC_TEMPLATES: {GENERAL_TOPIC_TEMPLATE: {TEMPLATE: string}}}) {
+    if (kafkaConfig && typeof kafkaConfig === 'string') kafkaConfig = JSON.parse(require('fs').readFileSync(kafkaConfig)).KAFKA
+    if (typeof kafkaConfig === 'object') {
       const Producer = require('@mojaloop/central-services-stream').Util.Producer
       this.toAny = false
       this.grpcClient = {
         log: async (event: EventMessage, callback: (error: unknown, response?: LogResponse) => void) => {
+          const type = event.metadata?.event.type || 'trace'
           try {
-            await Producer.produceMessage(event, {topicName: 'topic-event', key: event?.metadata?.trace?.traceId}, kafkaConfig)
+            await Producer.produceMessage(event, {topicName: 'topic-event-' + type, key: event?.metadata?.trace?.traceId}, kafkaConfig.PRODUCER?.EVENT[type.toUpperCase()].config)
             callback(null, { status: LogResponseStatus.accepted })
           } catch (error) {
             Logger.isErrorEnabled && Logger.error(error)
