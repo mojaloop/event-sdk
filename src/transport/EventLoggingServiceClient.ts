@@ -33,7 +33,7 @@ class EventLoggingServiceClient {
 
   constructor(host: string, port: number, kafkaConfig?: string | { PRODUCER: { EVENT: Record<string, {config: unknown}> }, TOPIC_TEMPLATES: {GENERAL_TOPIC_TEMPLATE: {TEMPLATE: string}}}) {
     if (kafkaConfig && typeof kafkaConfig === 'string') kafkaConfig = JSON.parse(require('fs').readFileSync(kafkaConfig)).KAFKA
-    if (typeof kafkaConfig === 'object') {
+    if (kafkaConfig && typeof kafkaConfig === 'object') {
       const Producer = require('@mojaloop/central-services-stream').Util.Producer
       this.toAny = false
       this.grpcClient = {
