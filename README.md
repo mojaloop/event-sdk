@@ -8,15 +8,15 @@
 [![NPM Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/npm/@mojaloop/event-sdk.svg?style=flat)](https://www.npmjs.com/package/@mojaloop/event-sdk)
 [![CircleCI](https://circleci.com/gh/mojaloop/event-sdk.svg?style=svg)](https://circleci.com/gh/mojaloop/event-sdk)
 
-Mojaloop Event SDK provides a simple API to log different kind of messages ( trace, log, error, audit ) and publish them to a central logging infrastructure. 
+Mojaloop Event SDK provides a simple API to log different kind of messages ( trace, log, error, audit ) and publish them to a central logging infrastructure.
 
 The API is defined by the `EventRecorder` interface and the `EventMessage` type.
 This library provides the following recorder implementations by default:
 
 | Recorder | Behaviour |
 | - | - |
-| `DefaultLoggerRecorder` | Logs events to console | 
-| `DefaultSidecarRecorder` | Logs events to [sidecar](https://github.com/mojaloop/event-sidecar) synchronously | 
+| `DefaultLoggerRecorder` | Logs events to console |
+| `DefaultSidecarRecorder` | Logs events to [sidecar](https://github.com/mojaloop/event-sidecar) synchronously |
 | `DefaultSidecarRecorderAsync` | Logs events to [sidecar](https://github.com/mojaloop/event-sidecar) asynchronously |
 
 The logging behaviour can be modified as defined in the interfaces `EventPreProcessor` and `EventPostProcessor` which allow to use an `EventRecorder` that processes `EventMessage`s before sending them and its response, respectively.
@@ -34,7 +34,7 @@ Edit the file in `./config/default.json` to configure the logger, or set the fol
 | Environment variable | Description | Default | Available Values |
 | --- | --- | --- | --- |
 | `EVENT_SDK_ASYNC_OVERRIDE_EVENTS` | A comma-separated list of events that should return immediately instead of waiting for the promises to resolve in the `recorder.record()` function. | `''` | Any combination of: `log,audit,trace` |
-|`EVENT_SDK_LOG_FILTER` | Comma deliminated List of `<eventType>`:`<eventAction>` key pairs that will be logged to the host console, as well as sent to the sidecar. Note `*:*` wildcard entry will print all logs, and if this field is empty ` ` then no logs will be printed. See [Current Supported Events](#current-supported-events) | `audit:*`, `log:info`, `log:error`, `log:warning` | `audit:*`, `log:info`, `log:error` |
+|`EVENT_SDK_LOG_FILTER` | Comma delimited List of `<eventType>`:`<eventAction>` key pairs that will be logged to the host console, as well as sent to the sidecar. Note `*:*` wildcard entry will print all logs, and if this field is empty ` ` then no logs will be printed. See [Current Supported Events](#current-supported-events) | `audit:*`, `log:info`, `log:error`, `log:warning` | `audit:*`, `log:info`, `log:error` |
 |`EVENT_SDK_LOG_METADATA_ONLY` | This flag will only print the metadata portion of the event message, and exclude the content to minimise log verbosity. | `false` | `true`, `false` |
 | `EVENT_SDK_SERVER_HOST` | The hostname for the gRPC server to bind to. | `localhost` | Any valid hostname |
 | `EVENT_SDK_SERVER_PORT` | The port for the gRPC server to listen on. | `50055` | Any valid port value |
@@ -43,6 +43,10 @@ Edit the file in `./config/default.json` to configure the logger, or set the fol
 | `EVENT_SDK_VENDOR_PREFIX` | Prefix for vendor specific tracestate handler. For more information refer [here](#tracestate-format-and-methods) | `acmevendor` | Any string |
 | `EVENT_SDK_TRACESTATE_HEADER_ENABLED` | If enabled, the tracestate value is kept updated with every child and is inserted into the span tags. Otherwise, the tracestate is only updated if `injectContextToHttpRequest` is called and the `tracestate` is included into the request headers. | `false` | `true`, `false` |
 | `EVENT_SDK_TRACEID_PER_VENDOR` | If enabled, when vendor of the parent span is different from the vendor set by `EVENT_SDK_VENDOR_PREFIX` the traceId will be new and the parent traceId will be stored as a tag: `corelationTraceId` . Otherwise, the traceId is persisted. | `false` | `true`, `false` |
+| `EVENT_LOGGER_KAFKA` | When configured, events will be sent by default directly to Kafka. Should contain configuration for 3 Kafka producers in `PRODUCER.EVENT.LOG`, `PRODUCER.EVENT.TRACE` and `PRODUCER.EVENT.AUDIT` | `undefined` | `undefined`, `{PRODUCER:...}` |
+| `EVENT_LOG`   | Controls processing of log events. When `undefined` the default processing is used.  | `undefined` | `undefined`, `sidecar`, `kafka`, `console`, `off` |
+| `EVENT_TRACE` | Controls processing of trace events. When `undefined` the default processing is used.| `undefined` | `undefined`, `sidecar`, `kafka`, `console`, `off` |
+| `EVENT_AUDIT` | Controls processing of audit events. When `undefined` the default processing is used.| `undefined` | `undefined`, `sidecar`, `kafka`, `console`, `off` |
 
 ## Tracestate format and methods
 
