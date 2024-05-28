@@ -48,10 +48,10 @@ describe('EventLoggingServiceServer', () => {
       grpc.Server.mockImplementationOnce(() => ({
         addService: mockAddService
       }))
-      
+
       // Act
       new EventLoggingServiceServer('localhost', 4444)
-      
+
       // Assert
       expect(grpc.Server).toHaveBeenCalledTimes(1)
       expect(mockAddService).toHaveBeenCalledTimes(1)
@@ -65,23 +65,51 @@ describe('EventLoggingServiceServer', () => {
       loadEventLoggerService.mockReturnValueOnce({
         service: 'mock'
       })
-      
+
       const mockServer = {
         addService: jest.fn(),
-        bindAsync: jest.fn(),
+        bindAsync: jest.fn((_, __, callback) => {
+          callback(null, 4444)
+        }),
         start: jest.fn()
       }
       grpc.Server.mockImplementationOnce(() => mockServer)
       const server = new EventLoggingServiceServer('localhost', 4444)
-      
+
       // Act
       server.start()
-      
+
       // Assert
       expect(mockServer.bindAsync).toHaveBeenCalledTimes(1)
     })
   })
-  
+
+  describe('start error', () => {
+    it('starts the grpc server with error', () => {
+      // Arrange
+      //@ts-ignore
+      loadEventLoggerService.mockReturnValueOnce({
+        service: 'mock'
+      })
+
+      const mockServer = {
+        addService: jest.fn(),
+        bindAsync: jest.fn((_, __, callback) => {
+          callback(new Error('error'))
+        }),
+        start: jest.fn()
+      }
+      grpc.Server.mockImplementationOnce(() => mockServer)
+      const server = new EventLoggingServiceServer('localhost', 4444)
+
+      // Act
+      expect(() => server.start()).toThrow('error')
+
+      // Assert
+      expect(mockServer.bindAsync).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('logEventReceivedHandler', () => {
     beforeEach(() => {
       //@ts-ignore
@@ -107,10 +135,10 @@ describe('EventLoggingServiceServer', () => {
       }
       const callback = jest.fn()
       const expectedResponse = new LogResponse(LogResponseStatus.accepted)
-  
+
       // Act
-      server.logEventReceivedHandler(call, callback)    
-  
+      server.logEventReceivedHandler(call, callback)
+
       // Assert
       expect(server.emit).toHaveBeenCalledTimes(1)
       expect(callback).toHaveBeenCalledWith(null, expectedResponse)
@@ -131,10 +159,10 @@ describe('EventLoggingServiceServer', () => {
       }
       const callback = jest.fn()
       const expectedResponse = new LogResponse(LogResponseStatus.accepted)
-  
+
       // Act
-      server.logEventReceivedHandler(call, callback)    
-  
+      server.logEventReceivedHandler(call, callback)
+
       // Assert
       expect(server.emit).toHaveBeenCalledTimes(1)
       expect(callback).toHaveBeenCalledWith(null, expectedResponse)
@@ -155,10 +183,10 @@ describe('EventLoggingServiceServer', () => {
       }
       const callback = jest.fn()
       const expectedResponse = new LogResponse(LogResponseStatus.error)
-  
+
       // Act
-      server.logEventReceivedHandler(call, callback)    
-  
+      server.logEventReceivedHandler(call, callback)
+
       // Assert
       expect(server.emit).toHaveBeenCalledTimes(0)
       expect(callback).toHaveBeenCalledWith(null, expectedResponse)

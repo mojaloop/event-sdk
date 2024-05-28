@@ -22,23 +22,43 @@
 
  --------------
  ******/
-import { EventMessage, LogResponse } from "../model/EventMessage";
+import { EventMessage, LogResponse, LogResponseStatus } from "../model/EventMessage";
 import { toAny } from "./MessageMapper";
-import { loadEventLoggerService } from "./EventLoggerServiceLoader";
 
 const Logger = require('@mojaloop/central-services-logger')
-const grpc = require('@grpc/grpc-js')
 
 class EventLoggingServiceClient {
   grpcClient : any;
+  toAny: boolean;
 
-  constructor(host: string, port: number) {
-    const eventLoggerService = loadEventLoggerService();
+  constructor(host: string, port: number, kafkaConfig?: string | { PRODUCER: { EVENT: Record<string, {config: unknown}> }, TOPIC_TEMPLATES: {GENERAL_TOPIC_TEMPLATE: {TEMPLATE: string}}}) {
+    if (kafkaConfig && typeof kafkaConfig === 'string') kafkaConfig = JSON.parse(require('fs').readFileSync(kafkaConfig)).KAFKA
+    if (kafkaConfig && typeof kafkaConfig === 'object') {
+      const Producer = require('@mojaloop/central-services-stream').Util.Producer
+      this.toAny = false
+      this.grpcClient = {
+        log: async (event: EventMessage, callback: (error: unknown, response?: LogResponse) => void) => {
+          const type = event.metadata?.event.type || 'trace'
+          try {
+            await Producer.produceMessage(event, {topicName: 'topic-event-' + type, key: event?.metadata?.trace?.traceId}, kafkaConfig.PRODUCER?.EVENT[type.toUpperCase()].config)
+            callback(null, { status: LogResponseStatus.accepted })
+          } catch (error) {
+            Logger.isErrorEnabled && Logger.error(error)
+            callback(error)
+          }
+        }
+      }
+    } else {
+      const { loadEventLoggerService } = require('./EventLoggerServiceLoader');
+      const grpc = require('@grpc/grpc-js')
+      const eventLoggerService = loadEventLoggerService();
 
-    const client = new eventLoggerService(`${host}:${port}`, grpc.credentials.createInsecure())
-    this.grpcClient = client
+      const client = new eventLoggerService(`${host}:${port}`, grpc.credentials.createInsecure())
+      this.toAny = true
+      this.grpcClient = client
+    }
   }
-  
+
   /**
    * Log an event
    */
@@ -50,16 +70,18 @@ class EventLoggingServiceClient {
       }
 
       try {
-        wireEvent.content = toAny(event.content, event.type);
+        if (this.toAny) {
+          wireEvent.content = toAny(event.content, event.type);
 
-        if (Logger.isDebugEnabled) {
-          const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.length})`}} 
-          Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
-        }
+          if (Logger.isDebugEnabled) {
+            const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.length})`}}
+            Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+          }
+        } else wireEvent.content = event.content
         this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
           Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
           if (error) {
-            reject(error); 
+            reject(error);
           }
           resolve(response);
         })
