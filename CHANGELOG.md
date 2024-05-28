@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.1.0](https://github.com/mojaloop/event-sdk/compare/v14.0.3-snapshot.4...v14.1.0) (2024-05-28)
+
+
+### Features
+
+* enable sending events directly to Kafka ([#81](https://github.com/mojaloop/event-sdk/issues/81)) ([bccf7da](https://github.com/mojaloop/event-sdk/commit/bccf7da76e3fc24ca1b590cb3b5b9729468f230a))
+
 ### [14.0.2](https://github.com/mojaloop/event-sdk/compare/v14.0.1...v14.0.2) (2024-04-09)
 
 ### [14.0.1](https://github.com/mojaloop/event-sdk/compare/v14.0.0...v14.0.1) (2024-03-19)
