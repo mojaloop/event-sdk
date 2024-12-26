@@ -38,6 +38,7 @@
     "test"
   ],
   "scripts": {
+    "_phase:build": "npm run build",
     "ts_app": "npx tsc ; npx ts-node src/examples/ts_app.ts",
     "js_app": "npx tsc ; npx ts-node src/examples/js_app.js",
     "server": "npx tsc ; npx ts-node src/server/server.ts",
