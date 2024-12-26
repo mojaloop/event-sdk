@@ -82,3 +82,5 @@ private
 
 # Ignore general
 **/*.IGNORE.*
+
+.rush
