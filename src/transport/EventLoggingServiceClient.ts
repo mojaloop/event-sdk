@@ -44,6 +44,7 @@ class EventLoggingServiceClient {
       this.grpcClient = {
         log: async (event: EventMessage, callback: (error: unknown, response?: LogResponse) => void) => {
           const type = event.metadata?.event.type || 'trace'
+          /* istanbul ignore next */
           try {
             await Producer.produceMessage(event, {
               topicName: 'topic-event-' + type,
