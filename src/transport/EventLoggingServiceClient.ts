@@ -44,7 +44,7 @@ class EventLoggingServiceClient {
       this.grpcClient = {
         log: async (event: EventMessage, callback: (error: unknown, response?: LogResponse) => void) => {
           const type = event.metadata?.event.type || 'trace'
-          /* istanbul ignore next */
+          // istanbul ignore next
           try {
             await Producer.produceMessage(event, {
               topicName: 'topic-event-' + type,
@@ -95,8 +95,9 @@ class EventLoggingServiceClient {
           if (error) {
             logger.warn(`EventLoggingServiceClient.log error: ${error instanceof Error ? error.message: ''}`, error)
             reject(error);
+          } else {
+            resolve(response);
           }
-          resolve(response);
         })
       } catch (err: unknown) {
         logger.error(`error event: ${err instanceof Error ? err.message: ''}`, err)
