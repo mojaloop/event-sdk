@@ -2,6 +2,7 @@ import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, Even
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
 import Config from "./lib/config";
 
+const stringify = require('safe-stable-stringify')
 const Logger = require('@mojaloop/central-services-logger')
 
 /**
@@ -36,6 +37,7 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
     try {
       let type: TypeEventTypeAction['type']
       let action: TypeEventTypeAction['action']
+
       if (message && ('metadata' in message) && ('event' in message.metadata!)) {
         type = message.metadata!.event.type!
         action = message.metadata!.event.action!
@@ -48,14 +50,14 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
       }
 
       if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
-        Logger.log(action, JSON.stringify(message, null, 2))
+        Logger.log(action, `LOG_EVENT_ACTION - ${stringify(message)}`)
       } else {
-        Logger.log(type, JSON.stringify(message, null, 2))
+        Logger.log(type, `LOG_EVENT_TYPE - ${stringify(message)}`)
       }
 
       resolve({ status: LogResponseStatus.accepted })
     } catch(e) {
-      reject({status: LogResponseStatus.error, error: e})
+      reject({ status: LogResponseStatus.error, error: e })
     }
   })
 }
@@ -141,7 +143,7 @@ class DefaultSidecarRecorderAsync implements IEventRecorder {
   }
 
   async record(event: EventMessage, doLog: boolean = true, callback?: (result: any) => void): Promise<any> {
-    doLog && logWithLevel(this.logLoad(event))
+    doLog && await logWithLevel(this.logLoad(event))
     let updatedEvent = this.preProcess(event)
     let result = this.recorder.log(updatedEvent)
     if (callback) {

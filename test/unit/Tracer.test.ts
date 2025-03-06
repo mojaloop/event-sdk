@@ -37,7 +37,7 @@
 // Mock out logging to make output less verbose
 // jest.<String>Uuid()('@mojaloop/central-services-logger')
 
-const Uuid = require('uuid4')
+const Uuid = require('node:crypto').randomUUID
 // import '@mojaloop/central-services-logger'
 
 import { EventLoggingServiceClient } from '../../src/transport/EventLoggingServiceClient'
