@@ -32,8 +32,8 @@
 
 import Config from '../lib/config'
 
-const crypto = require('crypto')
-const Uuid = require('uuid4')
+const crypto = require('node:crypto')
+const Uuid = crypto.randomUUID
 
 const TRACE_ID_REGEX = /^[0-9abcdef]{32}$/;
 const SPAN_ID_REGEX = /^[0-9abcdef]{16}$/
@@ -302,9 +302,9 @@ class EventStateMetadata implements TypeEventStateMetadata {
 
   /**
    * Creates new state object
-   * @param status 
-   * @param code 
-   * @param description 
+   * @param status
+   * @param code
+   * @param description
    */
   constructor(status: EventStatusType, code?: number, description?: string) {
     this.status = status
@@ -357,16 +357,16 @@ class EventMetadata implements TypeEventMetadata {
   responseTo?: string
 
   /**
-   * Creates log type event metadata 
-   * @param eventMetadata 
+   * Creates log type event metadata
+   * @param eventMetadata
    */
   static log(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new LogEventTypeAction({ action: eventMetadata.action });
     return new EventMetadata(Object.assign(eventMetadata, typeAction));
   }
   /**
-   * Creates trace type event metadata 
-   * @param eventMetadata 
+   * Creates trace type event metadata
+   * @param eventMetadata
    */
   static trace(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new TraceEventTypeAction({ action: eventMetadata.action });
@@ -374,9 +374,9 @@ class EventMetadata implements TypeEventMetadata {
   }
 
   /**
-   * Creates audit type event metadata 
-   * @param eventMetadata 
-   */  
+   * Creates audit type event metadata
+   * @param eventMetadata
+   */
   static audit(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new AuditEventTypeAction({ action: eventMetadata.action });
     const a = (Object.assign(eventMetadata, typeAction))
@@ -385,7 +385,7 @@ class EventMetadata implements TypeEventMetadata {
 
   /**
    * Creates metadata object based on the passed message
-   * @param eventMetadata 
+   * @param eventMetadata
    */
   constructor(eventMetadata: TypeEventMetadata) {
     const { createdAt = new Date().toISOString(), state, ...restParams } = eventMetadata

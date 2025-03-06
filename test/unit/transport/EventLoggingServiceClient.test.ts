@@ -28,7 +28,7 @@
  --------------
  ******/
 
-const Uuid = require('uuid4')
+const Uuid = require('node:crypto').randomUUID
 
 import { EventLoggingServiceClient } from '../../../src/transport/EventLoggingServiceClient'
 import { EventMessage, LogResponse, LogResponseStatus } from '../../../src/model/EventMessage'
@@ -49,10 +49,10 @@ describe('EventLoggingServiceClient', () => {
       type: 'application/json',
       id: <string>Uuid()
     }
-    
+
     // Act
     const action = async () => await client.log(invalidEvent)
-    
+
     // Assert
     await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
   })
@@ -64,10 +64,10 @@ describe('EventLoggingServiceClient', () => {
       id: <string>Uuid(),
       content: `{"hello":true}`
     }
-    
+
     // Act
     const action = async () => client.log(event)
-    
+
     // Assert
     await expect(action()).rejects.toThrowError('toAny called with unsupported data type invalid')
   })
@@ -85,10 +85,10 @@ describe('EventLoggingServiceClient', () => {
         cbFunc(null, response)
       })
     }
-    
+
     // Act
     const result = await client.log(event)
-    
+
     // Assert
     expect(result).toStrictEqual(new LogResponse(LogResponseStatus.accepted))
   })
@@ -106,10 +106,10 @@ describe('EventLoggingServiceClient', () => {
         cbFunc(null, response)
       })
     }
-    
+
     // Act
     const result = await client.log(event)
-    
+
     // Assert
     expect(result).toStrictEqual(new LogResponse(LogResponseStatus.accepted))
   })
@@ -128,10 +128,10 @@ describe('EventLoggingServiceClient', () => {
       })
     }
     Logger.isDebugEnabled = true
-    
+
     // Act
     const result = await client.log(event)
-    
+
     // Assert
     expect(result).toStrictEqual(new LogResponse(LogResponseStatus.accepted))
   })
@@ -149,10 +149,10 @@ describe('EventLoggingServiceClient', () => {
         cbFunc(error, null)
       })
     }
-    
+
     // Act
     const action = async () => client.log(event)
-    
+
     // Assert
     await expect(action()).rejects.toThrowError('test error')
   })
