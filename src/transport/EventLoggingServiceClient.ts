@@ -99,7 +99,7 @@ class EventLoggingServiceClient {
           }
         })
       } catch (err: unknown) {
-        Logger.error(`error event: ${err}`)
+        Logger.error(`error logging event: ${err}`)
         reject(err)
       }
     })
