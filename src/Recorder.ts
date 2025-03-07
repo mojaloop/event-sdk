@@ -3,7 +3,11 @@ import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient
 import Config from "./lib/config";
 
 const stringify = require('safe-stable-stringify')
-const Logger = require('@mojaloop/central-services-logger')
+const Logger = require('./lib/RecorderLogger')
+/*  !!! IMPORTANT !!!
+      Switching this logger to @mojaloop/central-services-logger caused  RangeError: Maximum call stack size exceeded
+      in QS handler integration tests, see details: https://infitx-technologies.atlassian.net/browse/CSI-1297
+ */
 
 /**
  * Describes Event Recorder interface
@@ -29,7 +33,6 @@ type LogResponseTypeError = {
   status: LogResponseStatus,
   error: any,
 }
-
 
 
 const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promise<LogResponseType> => {
