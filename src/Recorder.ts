@@ -2,8 +2,12 @@ import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, Even
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
 import Config from "./lib/config";
 
-// const Logger = require('./lib/logger')
-const Logger = require('@mojaloop/central-services-logger')
+const stringify = require('safe-stable-stringify')
+const Logger = require('./lib/logger')
+/*  !!! IMPORTANT !!!
+      Switching this logger to @mojaloop/central-services-logger caused  RangeError: Maximum call stack size exceeded
+      in QS handler integration tests, see details: https://infitx-technologies.atlassian.net/browse/CSI-1297
+ */
 
 /**
  * Describes Event Recorder interface
@@ -31,7 +35,6 @@ type LogResponseTypeError = {
 }
 
 
-
 const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promise<LogResponseType> => {
   return new Promise((resolve, reject) => {
     try {
@@ -49,9 +52,9 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
       }
 
       if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
-        Logger.log(action, JSON.stringify(message))
+        Logger.log(action, `LOG_EVENT_ACTION - ${stringify(message)}`)
       } else {
-        Logger.log(type, JSON.stringify(message))
+        Logger.log(type, `LOG_EVENT_TYPE - ${stringify(message)}`)
       }
 
       resolve({ status: LogResponseStatus.accepted })
@@ -142,7 +145,7 @@ class DefaultSidecarRecorderAsync implements IEventRecorder {
   }
 
   async record(event: EventMessage, doLog: boolean = true, callback?: (result: any) => void): Promise<any> {
-    doLog && logWithLevel(this.logLoad(event))
+    doLog && await logWithLevel(this.logLoad(event))
     let updatedEvent = this.preProcess(event)
     let result = this.recorder.log(updatedEvent)
     if (callback) {
