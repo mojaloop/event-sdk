@@ -30,7 +30,6 @@ import { EventMessage, LogResponse, LogResponseStatus } from "../model/EventMess
 import { toAny } from "./MessageMapper";
 
 const Logger = require('@mojaloop/central-services-logger')
-const { logger } = require('../lib/logger')
 
 class EventLoggingServiceClient {
   grpcClient : any;
@@ -53,7 +52,7 @@ class EventLoggingServiceClient {
 
             callback(null, { status: LogResponseStatus.accepted })
           } catch (err) {
-            logger.error(`error on producing event: ${err instanceof Error ? err.message: ''}`, err)
+            Logger.error(`error on producing event: ${err}`)
             callback(err)
           }
         }
@@ -93,14 +92,14 @@ class EventLoggingServiceClient {
         this.grpcClient.log(wireEvent, (error: unknown, response: LogResponse) => {
           Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
           if (error) {
-            logger.warn(`EventLoggingServiceClient.log error: ${error instanceof Error ? error.message: ''}`, error)
+            Logger.warn(`EventLoggingServiceClient.log error: ${error}`)
             reject(error);
           } else {
             resolve(response);
           }
         })
       } catch (err: unknown) {
-        logger.error(`error event: ${err instanceof Error ? err.message: ''}`, err)
+        Logger.error(`error logging event: ${err}`)
         reject(err)
       }
     })
