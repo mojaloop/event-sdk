@@ -48,14 +48,14 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
       }
 
       if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
-        Logger.log(action, JSON.stringify(message, null, 2))
+        Logger.log(action, JSON.stringify(message))
       } else {
-        Logger.log(type, JSON.stringify(message, null, 2))
+        Logger.log(type, JSON.stringify(message))
       }
 
       resolve({ status: LogResponseStatus.accepted })
     } catch(e) {
-      reject({status: LogResponseStatus.error, error: e})
+      reject({ status: LogResponseStatus.error, error: e })
     }
   })
 }
