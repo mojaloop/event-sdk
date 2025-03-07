@@ -2,7 +2,7 @@ import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, Even
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
 import Config from "./lib/config";
 
-const stringify = require('safe-stable-stringify')
+// const stringify = require('safe-stable-stringify')
 const Logger = require('@mojaloop/central-services-logger')
 
 /**
@@ -50,9 +50,9 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
       }
 
       if (type === EventType.log && Object.values(LogEventAction).includes(<LogEventAction>action)) {
-        Logger.log(action, `LOG_EVENT_ACTION - ${stringify(message)}`)
+        Logger.log(action, `LOG_EVENT_ACTION - ${JSON.stringify(message)}`)
       } else {
-        Logger.log(type, `LOG_EVENT_TYPE - ${stringify(message)}`)
+        Logger.log(type, `LOG_EVENT_TYPE - ${JSON.stringify(message)}`)
       }
 
       resolve({ status: LogResponseStatus.accepted })
@@ -143,7 +143,7 @@ class DefaultSidecarRecorderAsync implements IEventRecorder {
   }
 
   async record(event: EventMessage, doLog: boolean = true, callback?: (result: any) => void): Promise<any> {
-    doLog && await logWithLevel(this.logLoad(event))
+    doLog && logWithLevel(this.logLoad(event))
     let updatedEvent = this.preProcess(event)
     let result = this.recorder.log(updatedEvent)
     if (callback) {
