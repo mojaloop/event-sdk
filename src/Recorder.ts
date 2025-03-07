@@ -2,7 +2,8 @@ import { EventType, LogEventAction, LogResponseStatus, TypeEventTypeAction, Even
 import { EventLoggingServiceClient } from "./transport/EventLoggingServiceClient";
 import Config from "./lib/config";
 
-const Logger = require('./lib/logger')
+// const Logger = require('./lib/logger')
+const Logger = require('@mojaloop/central-services-logger')
 
 /**
  * Describes Event Recorder interface
