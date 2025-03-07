@@ -1,8 +1,6 @@
 const { createLogger, format, transports } = require('winston')
 const { combine, timestamp, colorize, printf } = format
 
-// const { customLevels, level, logTransport, transportFileOptions } = require('./lib/config')
-
 const allLevels = { error: 0, warn: 1, audit: 2, trace: 3, info: 4, perf: 5, verbose: 6, debug: 7, silly: 8 }
 // const customLevelsArr = customLevels.split(/ *, */) // extra white space before/after the comma is ignored
 // const ignoredLevels = customLevels ? Object.keys(allLevels).filter(key => !customLevelsArr.includes(key)) : []
@@ -19,7 +17,7 @@ const customFormat = printf(({ level, message, timestamp }: formatInput) => {
 
 const transport = new transports.Console()
 
-const Logger = createLogger({
+const RecorderLogger = createLogger({
   level: 'silly',
   levels: allLevels,
   format: combine(
@@ -42,4 +40,4 @@ const Logger = createLogger({
   exitOnError: false
 })
 
-module.exports = Logger
+module.exports = RecorderLogger
