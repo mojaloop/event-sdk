@@ -43,12 +43,17 @@ class EventLoggingServiceClient {
       this.grpcClient = {
         log: async (event: EventMessage, callback: (error: unknown, response?: LogResponse) => void) => {
           const type = event.metadata?.event.type || 'trace'
+          // istanbul ignore next
           try {
-            await Producer.produceMessage(event, {topicName: 'topic-event-' + type, key: event?.metadata?.trace?.traceId}, kafkaConfig.PRODUCER?.EVENT[type.toUpperCase()].config)
+            await Producer.produceMessage(event, {
+              topicName: 'topic-event-' + type,
+              key: event?.metadata?.trace?.traceId
+            }, kafkaConfig.PRODUCER?.EVENT[type.toUpperCase()].config)
+
             callback(null, { status: LogResponseStatus.accepted })
-          } catch (error) {
-            Logger.isErrorEnabled && Logger.error(error)
-            callback(error)
+          } catch (err) {
+            Logger.error(`error on producing event: ${err}`)
+            callback(err)
           }
         }
       }
@@ -81,17 +86,21 @@ class EventLoggingServiceClient {
             const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.length})`}}
             Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
           }
-        } else wireEvent.content = event.content
-        this.grpcClient.log(wireEvent, (error: any, response: LogResponse) => {
+        } else {
+          wireEvent.content = event.content
+        }
+        this.grpcClient.log(wireEvent, (error: unknown, response: LogResponse) => {
           Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
           if (error) {
+            Logger.warn(`EventLoggingServiceClient.log error: ${error}`)
             reject(error);
+          } else {
+            resolve(response);
           }
-          resolve(response);
         })
-      } catch (e) {
-        Logger.isErrorEnabled && Logger.error(e)
-        reject(e)
+      } catch (err: unknown) {
+        Logger.error(`error event: ${err}`)
+        reject(err)
       }
     })
   }

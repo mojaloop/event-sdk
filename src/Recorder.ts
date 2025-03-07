@@ -40,6 +40,7 @@ const logWithLevel = async (message: EventMessage | TypeMessageMetadata): Promis
     try {
       let type: TypeEventTypeAction['type']
       let action: TypeEventTypeAction['action']
+
       if (message && ('metadata' in message) && ('event' in message.metadata!)) {
         type = message.metadata!.event.type!
         action = message.metadata!.event.action!
