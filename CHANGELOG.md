@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.3.1](https://github.com/mojaloop/event-sdk/compare/v14.3.0...v14.3.1) (2025-03-11)
+
+
+### Bug Fixes
+
+* dependencies ([#92](https://github.com/mojaloop/event-sdk/issues/92)) ([b6c1b4c](https://github.com/mojaloop/event-sdk/commit/b6c1b4c29e20199851610357c1b7a7669cf390aa))
+
 ## [14.3.0](https://github.com/mojaloop/event-sdk/compare/v14.2.0...v14.3.0) (2025-03-07)
 
 
