@@ -63,7 +63,7 @@
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.12.6",
+    "@grpc/grpc-js": "1.13.0",
     "@grpc/proto-loader": "0.7.13",
     "brototype": "0.0.6",
     "error-callsites": "2.0.4",
@@ -111,8 +111,8 @@
     "trim": "0.0.3"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-logger": "11.6.1",
-    "@mojaloop/central-services-stream": "11.5.1"
+    "@mojaloop/central-services-logger": "^11.6.2",
+    "@mojaloop/central-services-stream": "^11.5.1"
   },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-logger": {
