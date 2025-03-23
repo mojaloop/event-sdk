@@ -1,10 +1,13 @@
 /*****
  License
  --------------
- Copyright © 2017 Bill & Melinda Gates Foundation
- The Mojaloop files are made available by the Bill & Melinda Gates Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+ Copyright © 2020-2025 Mojaloop Foundation
+ The Mojaloop files are made available by the Mojaloop Foundation under the Apache License, Version 2.0 (the "License") and you may not use these files except in compliance with the License. You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
+
  Unless required by applicable law or agreed to in writing, the Mojaloop files are distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
  Contributors
  --------------
  This is the official list of the Mojaloop project contributors for this file.
@@ -12,11 +15,12 @@
  should be listed with a '*' in the first column. People who have
  contributed from an organization can be listed under the organization
  that actually holds the copyright for their contributions (see the
- Gates Foundation organization for an example). Those individuals should have
+ Mojaloop Foundation for an example). Those individuals should have
  their names indented and be marked with a '-'. Email address can be added
  optionally within square brackets <email>.
- * Gates Foundation
- - Name Surname <name.surname@gatesfoundation.com>
+
+ * Mojaloop Foundation
+ - Name Surname <name.surname@mojaloop.io>
 
  - Ramiro González Maciel <ramiro@modusbox.com>
  - Valentin Genev <valentin.genev@modusbox.com>
@@ -28,8 +32,8 @@
 
 import Config from '../lib/config'
 
-const crypto = require('crypto')
-const Uuid = require('uuid4')
+const crypto = require('node:crypto')
+const Uuid = crypto.randomUUID
 
 const TRACE_ID_REGEX = /^[0-9abcdef]{32}$/;
 const SPAN_ID_REGEX = /^[0-9abcdef]{16}$/
@@ -298,9 +302,9 @@ class EventStateMetadata implements TypeEventStateMetadata {
 
   /**
    * Creates new state object
-   * @param status 
-   * @param code 
-   * @param description 
+   * @param status
+   * @param code
+   * @param description
    */
   constructor(status: EventStatusType, code?: number, description?: string) {
     this.status = status
@@ -353,16 +357,16 @@ class EventMetadata implements TypeEventMetadata {
   responseTo?: string
 
   /**
-   * Creates log type event metadata 
-   * @param eventMetadata 
+   * Creates log type event metadata
+   * @param eventMetadata
    */
   static log(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new LogEventTypeAction({ action: eventMetadata.action });
     return new EventMetadata(Object.assign(eventMetadata, typeAction));
   }
   /**
-   * Creates trace type event metadata 
-   * @param eventMetadata 
+   * Creates trace type event metadata
+   * @param eventMetadata
    */
   static trace(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new TraceEventTypeAction({ action: eventMetadata.action });
@@ -370,9 +374,9 @@ class EventMetadata implements TypeEventMetadata {
   }
 
   /**
-   * Creates audit type event metadata 
-   * @param eventMetadata 
-   */  
+   * Creates audit type event metadata
+   * @param eventMetadata
+   */
   static audit(eventMetadata: TypeEventMetadata): TypeEventMetadata {
     const typeAction = new AuditEventTypeAction({ action: eventMetadata.action });
     const a = (Object.assign(eventMetadata, typeAction))
@@ -381,7 +385,7 @@ class EventMetadata implements TypeEventMetadata {
 
   /**
    * Creates metadata object based on the passed message
-   * @param eventMetadata 
+   * @param eventMetadata
    */
   constructor(eventMetadata: TypeEventMetadata) {
     const { createdAt = new Date().toISOString(), state, ...restParams } = eventMetadata
