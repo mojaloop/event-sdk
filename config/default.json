@@ -6,6 +6,7 @@
   "VENDOR_PREFIX": "acmevendor",
   "TRACESTATE_HEADER_ENABLED": true,
   "LOG_FILTER": "audit:*, log:info, log:error, log:warning",
+  "LOG_LEVEL": "silly",
   "LOG_METADATA_ONLY": false,
   "TRACEID_PER_VENDOR": true
 }

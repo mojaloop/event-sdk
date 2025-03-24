@@ -3,6 +3,7 @@ const RC = require('parse-strings-in-object')(require('rc')('EVENT_SDK', require
 type LoggerType = 'sidecar' | 'kafka' | 'console' | 'off'
 
 type ConfigType = {
+  LOG_LEVEL: string,
   ASYNC_OVERRIDE_EVENTS: string,
   EVENT_LOGGER_TRACE: LoggerType,
   EVENT_LOGGER_AUDIT: LoggerType,
@@ -19,6 +20,7 @@ type ConfigType = {
 }
 
 const Config: ConfigType = {
+  LOG_LEVEL: RC.LOG_LEVEL,
   ASYNC_OVERRIDE_EVENTS: RC.ASYNC_OVERRIDE_EVENTS,
   EVENT_LOGGER_TRACE: RC.TRACE,
   EVENT_LOGGER_AUDIT: RC.AUDIT,
