@@ -21,6 +21,9 @@ const transport = new transports.Console()
 const RecorderLogger = createLogger({
   level: Config.LOG_LEVEL,
   levels: allLevels,
+  defaultMeta: {
+    context: 'EVENT',
+  },
   format: combine(
     timestamp(),
     colorize({
