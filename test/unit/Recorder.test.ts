@@ -160,7 +160,8 @@ describe('Recorder', () => {
 
     // Assert
     expect(grpcClient.grpcClient.log).toHaveBeenCalled();
-    expect(result).resolves
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    expect(result).resolves;
   })
 
   it('records a message with the DefaultSidecarRecorderAsync', async () => {
@@ -212,7 +213,8 @@ describe('Recorder', () => {
 
     // Assert
     expect(grpcClient.grpcClient.log).toHaveBeenCalled();
-    expect(result).resolves
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    expect(result).resolves;
   })
 
 })

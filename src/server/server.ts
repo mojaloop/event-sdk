@@ -30,11 +30,13 @@
 
 import { EventMessage } from "../model/EventMessage";
 import { EventLoggingServiceServer, EVENT_RECEIVED } from "../transport/EventLoggingServiceServer";
-import Config from '../lib/config'
-const Logger = require('@mojaloop/central-services-logger')
+import Config from '../lib/config';
+const Logger = require('@mojaloop/central-services-logger');
 
-const server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT)
+const server = new EventLoggingServiceServer(Config.EVENT_LOGGER_SERVER_HOST, Config.EVENT_LOGGER_SERVER_PORT);
 server.on(EVENT_RECEIVED, (eventMessage : EventMessage) => {
-  Logger.isDebugEnabled && Logger.debug(`Received eventMessage: ', ${JSON.stringify(eventMessage, null, 2)}`)
+  if (Logger.isDebugEnabled) {
+    Logger.debug(`Received eventMessage: ${JSON.stringify(eventMessage, null, 2)}`);
+  }
 });
 server.start();

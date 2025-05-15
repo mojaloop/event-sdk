@@ -68,7 +68,9 @@ class EventLoggingServiceServer extends events.EventEmitter {
                 throw err
             }
             this.server.start()
-            Logger.isInfoEnabled && Logger.info(`Server listening on ${this.host}:${port}...`)
+            if (Logger.isInfoEnabled) {
+              Logger.info(`Server listening on ${this.host}:${port}...`)
+            }
         }
     )
   }
@@ -80,7 +82,9 @@ class EventLoggingServiceServer extends events.EventEmitter {
       return callback(new Error(`Couldn't parse message parameter. It doesn't have an id property. parameter: ${event}`))
     }
 
-    Logger.isDebugEnabled && Logger.debug(`Server.logEventReceivedHandler event: ${JSON.stringify(event, null, 2)}`)
+    if (Logger.isDebugEnabled) {
+      Logger.debug(`Server.logEventReceivedHandler event: ${JSON.stringify(event, null, 2)}`)
+    }
     
     let response: LogResponse;
 

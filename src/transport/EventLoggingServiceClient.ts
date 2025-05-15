@@ -90,7 +90,9 @@ class EventLoggingServiceClient {
           wireEvent.content = event.content
         }
         this.grpcClient.log(wireEvent, (error: unknown, response: LogResponse) => {
-          Logger.isDebugEnabled && Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+          if (Logger.isDebugEnabled) {
+            Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+          }
           if (error) {
             Logger.warn(`EventLoggingServiceClient.log error: ${error}`)
             reject(error);
