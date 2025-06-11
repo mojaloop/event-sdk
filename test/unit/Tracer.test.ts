@@ -53,9 +53,9 @@ const mockConfig = Config.default
 
 describe('Tracer', () => {
   jest.mock('../../src/lib/config', () => mockConfig)
-  jest.mock('@mojaloop/central-services-stream', () => ({ Util: {Producer: {produceMessage(message: EventMessage) {}}}}));
+  jest.mock('@mojaloop/central-services-stream', () => ({ Util: {Producer: {produceMessage() {}}}}));
   const DefaultSidecarRecorder = jest.requireActual('../../src/Recorder').DefaultSidecarRecorder
-  const { LogResponse, LogResponseStatus, EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
+  const { EventTraceMetadata, HttpRequestOptions } = jest.requireActual('../../src/model/EventMessage')
   const Tracer = jest.requireActual('../../src/Tracer').Tracer
 
   const messageProtocol = {
@@ -120,7 +120,7 @@ describe('Tracer', () => {
   })
 
   describe('extractContextFromMessage', () => {
-    it('extacts the content with basic carrier', () => {
+    it('extracts the content with basic carrier', () => {
       // Arrange
       const carrier = {
         trace: {
@@ -144,7 +144,7 @@ describe('Tracer', () => {
       expect(result).toEqual(carrier.trace)
     })
 
-    it('extacts empty content with an invalid carrier', () => {
+    it('extracts empty content with an invalid carrier', () => {
       // Arrange
       const carrier = {
         notTrace: {
@@ -388,11 +388,11 @@ describe('Tracer', () => {
       const finishtime = new Date()
       await tracer.finish('message', undefined, finishtime)
       const a = async () => await IIChild.finish()
-      await expect(a()).not.toBeFalsy()
+      expect(await a()).not.toBeFalsy()
 
       // Throws when new trying to finish already finished trace
       let action = async () => await tracer.finish()
-      await expect(action()).rejects.toThrowError('span already finished')
+      await expect(action()).rejects.toThrow('span already finished')
 
       const newSpan = Tracer.createSpan('span')
       const finish = 'finish'
@@ -401,8 +401,8 @@ describe('Tracer', () => {
 
       action = async () => await tracer.audit(<EventMessage>newMessageA)
       const actionFinish = async () => await tracer.trace()
-      await expect(action()).rejects.toThrowError('span finished. no further actions allowed')
-      await expect(actionFinish()).rejects.toThrowError()
+      await expect(action()).rejects.toThrow('span finished. no further actions allowed')
+      await expect(actionFinish()).rejects.toThrow()
       const logresult = await child.audit(<EventMessage>newMessageA)
       expect(logresult).not.toBeUndefined()
     })
