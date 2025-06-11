@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.6.0](https://github.com/mojaloop/event-sdk/compare/v14.5.2...v14.6.0) (2025-06-11)
+
+
+### Features
+
+* bump up the node version to v22.15.1 and fix unit tests ([#99](https://github.com/mojaloop/event-sdk/issues/99)) ([6cdf8f4](https://github.com/mojaloop/event-sdk/commit/6cdf8f4b7377836cc07c670c0626e06f0a5830f3))
+
 ### [14.5.2](https://github.com/mojaloop/event-sdk/compare/v14.5.1...v14.5.2) (2025-06-11)
 
 ### [14.5.1](https://github.com/mojaloop/event-sdk/compare/v14.5.0...v14.5.1) (2025-05-19)
