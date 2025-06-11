@@ -33,10 +33,10 @@
 
 'use strict'
 
-import { 
+import {
   AuditEventTypeAction,
   EventType,
-  LogEventAction, 
+  LogEventAction,
   LogEventTypeAction,
   NullEventAction,
   AuditEventAction,
@@ -59,7 +59,7 @@ describe('EventMessage', () => {
       // Arrange
       // Act
       const { type, action } = new LogEventTypeAction()
-      
+
       // Assert
       expect(action).toBe(NullEventAction.undefined)
       expect(type).toBe(EventType.log)
@@ -249,7 +249,7 @@ describe('EventMessage', () => {
         },
         trace: new EventTraceMetadata({ service: "service_1" })
       } as TypeMessageMetadata
-        
+
       // Assert
       expect(message.id).toBe(id)
     })
@@ -271,7 +271,7 @@ describe('EventMessage', () => {
           },
           trace: new EventTraceMetadata({ service: "service_1" })
         } as TypeMessageMetadata
-        
+
         // Assert
         expect(message.metadata!.event.type).toBe(EventType.log)
         expect(message.metadata!.event.action).toBe(LogEventAction.verbose)
@@ -291,7 +291,7 @@ describe('EventMessage', () => {
           },
           trace: new EventTraceMetadata({ service: "service_1" })
         } as TypeMessageMetadata
-        
+
         // Assert
         expect(message.metadata!.event.type).toBe(EventType.audit)
         expect(message.metadata!.event.action).toBe(AuditEventAction.default)
@@ -376,7 +376,7 @@ describe('EventMessage', () => {
       // Arrange
       let startTimestamp = new Date()
       let service = 'a'
-      
+
       // Act
       let meta = new EventTraceMetadata({ startTimestamp, service })
 
@@ -388,7 +388,7 @@ describe('EventMessage', () => {
       // Arrange
       // Act
       const response = new LogResponse(LogResponseStatus.UNDEFINED)
-      
+
       // Assert
       expect(response.status).toBe(LogResponseStatus.UNDEFINED)
     })
@@ -397,37 +397,37 @@ describe('EventMessage', () => {
       // Arrange
       // Act
       const response = new LogResponse(LogResponseStatus.accepted)
-      
+
       // Assert
       expect(response.status).toBe(LogResponseStatus.accepted)
     })
 
     it('should throw Error when creating an EventTraceMetadata with invalid trace id', async () => {
       // Arrange
-      
+
       // Act
       const action = () => new EventTraceMetadata({ service: 'a', traceId: 'b' })
-      
+
       // Assert
       expect(action).toThrow()
     })
 
     it('should throw Error when creating an EventTraceMetadata with invalid span id', async () => {
       // Arrange
-      
+
       // Act
       const action = () => new EventTraceMetadata({ service: 'a', spanId: 'b' })
-      
+
       // Assert
       expect(action).toThrow()
     })
 
     it('should throw Error when creating an EventTraceMetadata with invalid parentSpan id', async () => {
       // Arrange
-      
+
       // Act
       const action = () => new EventTraceMetadata({ service: 'a', parentSpanId: 'b' })
-      
+
       // Assert
       expect(action).toThrow()
     })
@@ -443,7 +443,7 @@ describe('EventMessage', () => {
         "spanId": "6ae55cdac0c97978",
         "tags": {}
       }
-      
+
       // Act
       const trace = Tracer.createChildSpanFromContext(context.service, context)
 
