@@ -54,7 +54,7 @@ describe('EventLoggingServiceClient', () => {
     const action = async () => await client.log(invalidEvent)
 
     // Assert
-    await expect(action()).rejects.toThrowError('Invalid eventMessage: content is mandatory')
+    await expect(action()).rejects.toThrow('Invalid eventMessage: content is mandatory')
   })
 
   it('handles an exception when processing the event', async () => {
@@ -69,7 +69,7 @@ describe('EventLoggingServiceClient', () => {
     const action = async () => client.log(event)
 
     // Assert
-    await expect(action()).rejects.toThrowError('toAny called with unsupported data type invalid')
+    await expect(action()).rejects.toThrow('toAny called with unsupported data type invalid')
   })
 
   it('processes the event', async () => {
@@ -154,6 +154,6 @@ describe('EventLoggingServiceClient', () => {
     const action = async () => client.log(event)
 
     // Assert
-    await expect(action()).rejects.toThrowError('test error')
+    await expect(action()).rejects.toThrow('test error')
   })
 })
