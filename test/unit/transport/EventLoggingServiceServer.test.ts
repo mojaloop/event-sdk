@@ -217,7 +217,7 @@ describe('EventLoggingServiceServer', () => {
 
       // Assert
       expect(server.emit).toHaveBeenCalledTimes(0)
-      expect(callback).toBeCalledWith(new Error(`Couldn't parse message parameter. It doesn't have an id property. parameter: ${call.request}`))
+      expect(callback).toHaveBeenCalledWith(new Error(`Couldn't parse message parameter. It doesn't have an id property. parameter: ${call.request}`))
     })
   })
 })
