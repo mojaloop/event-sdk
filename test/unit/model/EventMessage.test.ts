@@ -409,7 +409,7 @@ describe('EventMessage', () => {
       const action = () => new EventTraceMetadata({ service: 'a', traceId: 'b' })
       
       // Assert
-      expect(action).toThrowError()
+      expect(action).toThrow()
     })
 
     it('should throw Error when creating an EventTraceMetadata with invalid span id', async () => {
@@ -419,7 +419,7 @@ describe('EventMessage', () => {
       const action = () => new EventTraceMetadata({ service: 'a', spanId: 'b' })
       
       // Assert
-      expect(action).toThrowError()
+      expect(action).toThrow()
     })
 
     it('should throw Error when creating an EventTraceMetadata with invalid parentSpan id', async () => {
@@ -429,7 +429,7 @@ describe('EventMessage', () => {
       const action = () => new EventTraceMetadata({ service: 'a', parentSpanId: 'b' })
       
       // Assert
-      expect(action).toThrowError()
+      expect(action).toThrow()
     })
   })
 

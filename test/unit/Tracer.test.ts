@@ -392,7 +392,7 @@ describe('Tracer', () => {
 
       // Throws when new trying to finish already finished trace
       let action = async () => await tracer.finish()
-      await expect(action()).rejects.toThrowError('span already finished')
+      await expect(action()).rejects.toThrow('span already finished')
 
       const newSpan = Tracer.createSpan('span')
       const finish = 'finish'
@@ -401,8 +401,8 @@ describe('Tracer', () => {
 
       action = async () => await tracer.audit(<EventMessage>newMessageA)
       const actionFinish = async () => await tracer.trace()
-      await expect(action()).rejects.toThrowError('span finished. no further actions allowed')
-      await expect(actionFinish()).rejects.toThrowError()
+      await expect(action()).rejects.toThrow('span finished. no further actions allowed')
+      await expect(actionFinish()).rejects.toThrow()
       const logresult = await child.audit(<EventMessage>newMessageA)
       expect(logresult).not.toBeUndefined()
     })
