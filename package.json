@@ -81,10 +81,10 @@
   },
   "devDependencies": {
     "@mojaloop/central-services-logger": "11.9.0",
-    "@mojaloop/central-services-stream": "11.6.1",
+    "@mojaloop/central-services-stream": "11.7.0",
     "@types/jest": "29.5.14",
     "@types/lodash": "4.17.17",
-    "@types/node": "24.0.0",
+    "@types/node": "24.0.1",
     "@types/sinon": "17.0.4",
     "@types/tape": "5.8.1",
     "@types/uuid": "10.0.0",
@@ -104,7 +104,7 @@
     "replace": "1.2.2",
     "sinon": "20.0.0",
     "tap-spec": "5.0.0",
-    "ts-jest": "29.3.4",
+    "ts-jest": "29.4.0",
     "ts-node": "10.9.2",
     "typedoc": "0.28.5",
     "typescript": "5.8.3"
@@ -117,8 +117,8 @@
     }
   },
   "peerDependencies": {
-    "@mojaloop/central-services-logger": ">=11.9.x",
-    "@mojaloop/central-services-stream": ">=11.6.x"
+    "@mojaloop/central-services-logger": ">=11.x.x",
+    "@mojaloop/central-services-stream": ">=11.x.x"
   },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-logger": {
