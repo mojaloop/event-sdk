@@ -1,6 +1,6 @@
 {
   "name": "@mojaloop/event-sdk",
-  "version": "14.6.0",
+  "version": "14.6.1",
   "description": "Shared code for Event Logging",
   "author": "ModusBox",
   "contributors": [
