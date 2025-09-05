@@ -29,6 +29,7 @@
 import { EventMessage, LogResponse, LogResponseStatus } from "../model/EventMessage";
 import { toAny } from "./MessageMapper";
 
+const stringify = require('safe-stable-stringify')
 const Logger = require('@mojaloop/central-services-logger')
 
 class EventLoggingServiceClient {
@@ -84,14 +85,14 @@ class EventLoggingServiceClient {
 
           if (Logger.isDebugEnabled) {
             const wireEventCopy = {...wireEvent, content: {...wireEvent.content, value: `Buffer(${wireEvent.content.value.length})`}}
-            Logger.debug(`EventLoggingServiceClient.log sending wireEvent: ${JSON.stringify(wireEventCopy, null, 2)}`);
+            Logger.debug(`EventLoggingServiceClient.log sending wireEvent:  ${stringify(wireEventCopy)}`);
           }
         } else {
           wireEvent.content = event.content
         }
         this.grpcClient.log(wireEvent, (error: unknown, response: LogResponse) => {
           if (Logger.isDebugEnabled) {
-            Logger.debug(`EventLoggingServiceClient.log received response: ${JSON.stringify(response, null, 2)}`);
+            Logger.debug(`EventLoggingServiceClient.log received response:  ${stringify(response)}`);
           }
           if (error) {
             Logger.warn(`EventLoggingServiceClient.log error: ${error}`)

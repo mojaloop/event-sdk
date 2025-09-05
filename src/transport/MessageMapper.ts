@@ -32,6 +32,8 @@
  ******/
 'use strict'
 
+const stringify = require('safe-stable-stringify')
+
 function toAny(data: any, type: string) {
   let value
   if (!data) {
@@ -43,9 +45,9 @@ function toAny(data: any, type: string) {
       value = Buffer.from(data)
     break;
     case 'application/json':
-      value = Buffer.from(JSON.stringify(data))
+      value = Buffer.from(stringify(data))
     break;
-    default: 
+    default:
       throw new Error(`toAny called with unsupported data type ${type}`)
   }
 
