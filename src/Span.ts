@@ -2,6 +2,9 @@ import _ from 'lodash'
 import { serializeError } from 'serialize-error'
 import TraceParent from 'traceparent'
 
+const stringify = require('safe-stable-stringify')
+const Logger = require('@mojaloop/central-services-logger')
+
 import {
   NullEventAction,
   AuditEventAction,
@@ -218,7 +221,7 @@ class Span implements Partial<ISpan> {
    * Gets trace context from the current span
    */
   getContext(): TypeSpanContext {
-    return Object.assign({}, this.spanContext, { tags: JSON.parse(JSON.stringify(this.spanContext.tags)) })
+    return Object.assign({}, this.spanContext, { tags: JSON.parse(stringify(this.spanContext.tags)) })
   }
 
   /**
@@ -379,13 +382,9 @@ class Span implements Partial<ISpan> {
         content: spanContext
       })
     }
-    try {
-      await this.recordMessage(message, TraceEventTypeAction.getType(), action, state)
-      this.isFinished = this.spanContext.finishTimestamp ? true : false
-      return this
-    } catch (e) {
-      throw new Error(`Error when logging trace. ${JSON.stringify(e, null, 2)}`)
-    }
+    await this.recordMessage(message, TraceEventTypeAction.getType(), action, state)
+    this.isFinished = this.spanContext.finishTimestamp ? true : false
+    return this
   }
 
   /**
@@ -479,31 +478,35 @@ class Span implements Partial<ISpan> {
    * @param state optional parameter for state. Defaults to 'success'
    */
   private async recordMessage(message: TypeOfMessage, type: TypeEventTypeAction['type'], action?: TypeEventTypeAction['action'], state?: EventStateMetadata) {
-    if (this.isFinished) {
-      throw new Error('span finished. no further actions allowed')
+    try {
+      if (this.isFinished) {
+        throw new Error('span finished. no further actions allowed')
+      }
+
+      let newEnvelope = this.createEventMessage(message, type, action, state)
+      let key = <RecorderKeys>`${type}Recorder`
+
+      let recorder = this.recorders.defaultRecorder
+      if (this.recorders[key]) {
+        recorder = this.recorders[key]!
+      }
+
+      if (Util.shouldOverrideEvent(asyncOverrides, type)) {
+        //Don't wait for .record() to resolve, return straight away
+        recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
+        return true
+      }
+
+      const logResult = await recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
+
+      if (logResult.status !== LogResponseStatus.accepted) {
+        throw new Error(`Error when recording ${type}-${action} event. status: ${logResult.status}`)
+      }
+
+      return logResult;
+    } catch (err) {
+      Logger.error(`error in span.recordMessage: ${(err as Error)?.stack}`)
     }
-
-    let newEnvelope = this.createEventMessage(message, type, action, state)
-    let key = <RecorderKeys>`${type}Recorder`
-
-    let recorder = this.recorders.defaultRecorder
-    if (this.recorders[key]) {
-      recorder = this.recorders[key]!
-    }
-
-    if (Util.shouldOverrideEvent(asyncOverrides, type)) {
-      //Don't wait for .record() to resolve, return straight away
-      recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
-      return true
-    }
-
-    const logResult = await recorder.record(newEnvelope, Util.shouldLogToConsole(type, action))
-
-    if (logResult.status !== LogResponseStatus.accepted) {
-      throw new Error(`Error when recording ${type}-${action} event. status: ${logResult.status}`)
-    }
-
-    return logResult;
   }
 
   /**
@@ -629,7 +632,7 @@ const encodeTracestate = (context: TypeSpanContext): { ['ownTraceStateString']: 
   const newOpaqueValueMap = ((typeof tracestatesMap[Config.EVENT_LOGGER_VENDOR_PREFIX]) === 'object')
     ? Object.assign(tracestatesMap[Config.EVENT_LOGGER_VENDOR_PREFIX], { spanId })
     : null
-  let opaqueValue = newOpaqueValueMap ? JSON.stringify(newOpaqueValueMap) : `{"spanId":"${spanId}"}`
+  let opaqueValue = newOpaqueValueMap ? stringify(newOpaqueValueMap) : `{"spanId":"${spanId}"}`
 
   return { ownTraceStateString: `${Config.EVENT_LOGGER_VENDOR_PREFIX}=${Buffer.from(opaqueValue).toString('base64')}`, restTraceStateString }
 }

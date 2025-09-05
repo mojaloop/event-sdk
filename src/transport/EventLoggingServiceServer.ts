@@ -34,6 +34,7 @@ import events from 'events'
 import { Server as GRPCServer } from '@grpc/grpc-js';
 
 const grpc = require('@grpc/grpc-js')
+const stringify = require('safe-stable-stringify')
 const Logger = require('@mojaloop/central-services-logger')
 
 const EVENT_RECEIVED = 'eventReceived';
@@ -61,7 +62,7 @@ class EventLoggingServiceServer extends events.EventEmitter {
 
   start() : any {
     this.server.bindAsync(
-        `${this.host}:${this.port}`, 
+        `${this.host}:${this.port}`,
         grpc.ServerCredentials.createInsecure(),
         (err: any, port: any) => {
             if (err) {
@@ -83,9 +84,9 @@ class EventLoggingServiceServer extends events.EventEmitter {
     }
 
     if (Logger.isDebugEnabled) {
-      Logger.debug(`Server.logEventReceivedHandler event: ${JSON.stringify(event, null, 2)}`)
+      Logger.debug(`Server.logEventReceivedHandler event: ${stringify(event)}`)
     }
-    
+
     let response: LogResponse;
 
     try {
@@ -97,14 +98,14 @@ class EventLoggingServiceServer extends events.EventEmitter {
       }
 
       this.emit(EVENT_RECEIVED, eventMessage);
-    
+
       response = new LogResponse(LogResponseStatus.accepted)
     } catch (error) {
       response = new LogResponse(LogResponseStatus.error)
     }
 
     callback(null, response)
-  } 
+  }
 }
 
 export {
