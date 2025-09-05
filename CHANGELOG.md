@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [14.7.0](https://github.com/mojaloop/event-sdk/compare/v14.6.1...v14.7.0) (2025-09-05)
+
+
+### Features
+
+* **csi-1695:** added try/catch to span.recordMessage; used safe-stringify ([#101](https://github.com/mojaloop/event-sdk/issues/101)) ([e82c1ab](https://github.com/mojaloop/event-sdk/commit/e82c1ab789c3e4b7b81c17ce4e64dbd460e5efba))
+
 ### [14.6.1](https://github.com/mojaloop/event-sdk/compare/v14.6.0...v14.6.1) (2025-06-12)
 
 ## [14.6.0](https://github.com/mojaloop/event-sdk/compare/v14.5.2...v14.6.0) (2025-06-11)
