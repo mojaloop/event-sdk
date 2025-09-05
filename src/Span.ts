@@ -303,7 +303,7 @@ class Span implements Partial<ISpan> {
    */
   getTags(): TraceTags {
     const { tags } = this.getContext()
-    return tags ? tags : {}
+    return !!tags ? tags : {}
   }
 
   /**
