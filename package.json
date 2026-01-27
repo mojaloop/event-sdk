@@ -68,7 +68,7 @@
     "@grpc/proto-loader": "0.8.0",
     "brototype": "0.0.6",
     "error-callsites": "2.0.4",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "moment": "2.30.1",
     "parse-strings-in-object": "2.0.0",
     "protobufjs": "7.5.4",
