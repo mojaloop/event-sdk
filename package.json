@@ -58,8 +58,8 @@
     "warn-pre-commit": "echo \"pre commit tasks running. build and test\"",
     "audit:fix": "npm audit fix",
     "audit:check": "npx audit-ci --config ./audit-ci.jsonc",
-    "dep:check": "npx ncu -e 2",
-    "dep:update": "npx ncu -u",
+    "dep:check": "npx ncu -e 2 --target @minor-infitx",
+    "dep:update": "npx ncu -u --target @minor-infitx",
     "release": "npx standard-version --no-verify --releaseCommitMessageFormat 'chore(release): {{currentTag}} [skip ci]'",
     "snapshot": "npx standard-version --no-verify --skip.changelog --prerelease snapshot --releaseCommitMessageFormat 'chore(snapshot): {{currentTag}}'"
   },
@@ -80,8 +80,8 @@
     "winston": "3.19.0"
   },
   "devDependencies": {
-    "@mojaloop/central-services-logger": "11.10.4",
-    "@mojaloop/central-services-stream": "11.9.1",
+    "@mojaloop/central-services-logger": "11.11.0-infitx.2",
+    "@mojaloop/central-services-stream": "11.10.0-infitx.4",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.23",
     "@types/node": "25.2.3",
@@ -124,8 +124,8 @@
     "diff": "4.0.4"
   },
   "peerDependencies": {
-    "@mojaloop/central-services-logger": ">=11.x.x",
-    "@mojaloop/central-services-stream": ">=11.x.x"
+    "@mojaloop/central-services-logger": ">=11.11.0-infitx.0 <=11.11.0-infitx.9999",
+    "@mojaloop/central-services-stream": ">=11.10.0-infitx.0 <=11.10.0-infitx.9999"
   },
   "peerDependenciesMeta": {
     "@mojaloop/central-services-logger": {
