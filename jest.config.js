@@ -20,7 +20,6 @@ module.exports = {
   ],
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   verbose: true,
-  openHandlesTimeout: 3000,
   coverageThreshold: {
     global: {
       statements: 90,
