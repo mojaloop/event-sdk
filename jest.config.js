@@ -4,7 +4,15 @@ module.exports = {
     '**/test/unit/**/*.test.ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        // other options
+        diagnostics: {
+          ignoreCodes: [151002],
+        },
+      },
+    ]
   },
   transformIgnorePatterns: [
     '^.+\\.json$',
@@ -12,6 +20,7 @@ module.exports = {
   ],
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   verbose: true,
+  openHandlesTimeout: 3000,
   coverageThreshold: {
     global: {
       statements: 90,
@@ -22,5 +31,5 @@ module.exports = {
   },
   coveragePathIgnorePatterns: [
     "src/index.ts"
-  ]
+  ],
 }
