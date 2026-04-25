@@ -95,7 +95,7 @@
     "eslint": "9.39.1",
     "eslint-config-prettier": "10.1.8",
     "jest": "30.0.0",
-    "jest-junit": "16.0.0",
+    "jest-junit": "17.0.0",
     "npm-check-updates": "21.0.3",
     "nyc": "18.0.0",
     "pre-commit": "1.2.2",
