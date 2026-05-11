@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [14.8.4](https://github.com/mojaloop/event-sdk/compare/v14.8.3...v14.8.4) (2026-05-11)
+
+
+### Bug Fixes
+
+* replace old "replace" package that is no longer incompatible with new version of minimatch ([#112](https://github.com/mojaloop/event-sdk/issues/112)) ([237ab7b](https://github.com/mojaloop/event-sdk/commit/237ab7b07146bb23b8a0fd3b1b0cf60268d29183))
+* security vulnerability GHSA-xq3m-2v4x-88gg ([#111](https://github.com/mojaloop/event-sdk/issues/111)) ([d543bfe](https://github.com/mojaloop/event-sdk/commit/d543bfe7f68f74b19dc89997daa21f167130e10b))
+
 ### [14.8.3](https://github.com/mojaloop/event-sdk/compare/v14.8.2...v14.8.3) (2026-02-18)
 
 ### [14.8.2](https://github.com/mojaloop/event-sdk/compare/v14.8.1...v14.8.2) (2025-12-08)
