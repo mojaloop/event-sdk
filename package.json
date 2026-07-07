@@ -85,7 +85,7 @@
     "@mojaloop/central-services-stream": "11.9.1",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.24",
-    "@types/node": "26.1.0",
+    "@types/node": "24.13.2",
     "@types/sinon": "22.0.0",
     "@types/tape": "5.8.1",
     "@typescript-eslint/eslint-plugin": "8.63.0",
